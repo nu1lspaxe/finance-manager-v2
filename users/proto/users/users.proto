@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "finance_manager/proto/users;proto";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service UserService {
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/user"
+            body: "*"
+        };
+    }
+    rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{id}"
+        };
+    }
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+        option (google.api.http) = {
+            get: "/v1/users"
+        };
+    }
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+        option (google.api.http) = {
+            patch: "/v1/users/{id}"
+            body: "*"
+        };
+    }
+    rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+        option (google.api.http) = {
+            delete: "/v1/users/{id}"
+        };
+    }
+}
+
+message User {
+    int64 id = 1;
+    string username = 2;
+    string email = 3;
+    string password = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp updated_at = 6;
+}
+
+message CreateUserRequest {
+    string username = 1;
+    string email = 2 [(buf.validate.field).cel = {
+        id: "valid_email"
+        message: "email must be a valid email"
+        expression: "this.isEmail()"
+      }];
+    string password = 4;
+}
+
+message CreateUserResponse {
+    User user = 1;
+}
+
+message GetUserRequest {
+    int64 id = 1;
+}
+
+message GetUserResponse {
+    User user = 1;
+}
+
+message ListUsersRequest {
+    uint32 page = 1 [(buf.validate.field).uint32 = {gt: 0}];
+    uint32 page_size = 2 [(buf.validate.field).uint32 = {gt: 1}];
+}
+
+message ListUsersResponse {
+    repeated User users = 1;
+}
+
+message UpdateUserRequest {
+    int64 id = 1;
+    string username = 2;
+    string email = 3 [(buf.validate.field).cel = {
+        id: "valid_email"
+        message: "email must be a valid email"
+        expression: "this.isEmail()"
+    }];
+    string password = 4;
+}
+
+message UpdateUserResponse {
+    bool success = 1;
+}
+
+message DeleteUserRequest {
+    int64 id = 1;
+}
+
+message DeleteUserResponse {
+    bool success = 1;
+}
