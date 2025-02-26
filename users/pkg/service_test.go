@@ -1,0 +1,201 @@
+package pkg
+
+import (
+	"errors"
+	"testing"
+	"users/pkg/mocks"
+	"users/postgres/sqlc"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+func TestCreateUser(t *testing.T) {
+	t.Run("success case", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("CheckUserEmailExists", "test@example.com").
+			Return(false, nil).
+			On("CreateUser", "testuser", "test@example.com", mock.Anything).
+			Return(sqlc.User{
+				ID:       1,
+				Username: "testuser",
+				Email:    "test@example.com",
+				Password: mock.Anything,
+			}, nil)
+
+		service := NewUserService(mockRepo)
+
+		_, err := service.CreateUser("testuser", "test@example.com", "password")
+		assert.NoError(t, err)
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("invalid case - email already exists", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("CheckUserEmailExists", "test@example.com").
+			Return(true, nil)
+
+		service := NewUserService(mockRepo)
+
+		_, err := service.CreateUser("testuser", "test@example.com", "password")
+		assert.Error(t, err)
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("invalid case - repository error", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("CheckUserEmailExists", "test@example.com").
+			Return(false, nil).
+			On("CreateUser", "testuser", "test@example.com", mock.Anything).
+			Return(sqlc.User{}, errors.New("repository error"))
+
+		service := NewUserService(mockRepo)
+
+		_, err := service.CreateUser("testuser", "test@example.com", "password")
+		assert.Error(t, err)
+		assert.Equal(t, "repository error", err.Error())
+		mockRepo.AssertExpectations(t)
+	})
+}
+
+func TestGetUser(t *testing.T) {
+	t.Run("success case", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("GetUser", int64(1)).
+			Return(sqlc.User{
+				ID:       1,
+				Username: "testuser",
+				Email:    "test@example.com",
+				Password: mock.Anything,
+			}, nil)
+
+		service := NewUserService(mockRepo)
+
+		_, err := service.GetUser(1)
+		assert.NoError(t, err)
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("invalid case - repository error", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("GetUser", int64(1)).
+			Return(sqlc.User{}, errors.New("repository error"))
+
+		service := NewUserService(mockRepo)
+
+		_, err := service.GetUser(1)
+		assert.Error(t, err)
+		assert.Equal(t, "repository error", err.Error())
+		mockRepo.AssertExpectations(t)
+	})
+}
+
+func TestListUsers(t *testing.T) {
+	t.Run("success case", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("ListUsers").
+			Return([]sqlc.User{
+				{
+					ID:       1,
+					Username: "testuser",
+					Email:    "test@example.com",
+					Password: mock.Anything,
+				},
+			}, nil)
+
+		service := NewUserService(mockRepo)
+
+		_, err := service.ListUsers(1, 10)
+		assert.NoError(t, err)
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("invalid case - repository error", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("ListUsers").
+			Return([]sqlc.User{}, errors.New("repository error"))
+
+		service := NewUserService(mockRepo)
+
+		_, err := service.ListUsers(1, 10)
+		assert.Error(t, err)
+		assert.Equal(t, "repository error", err.Error())
+		mockRepo.AssertExpectations(t)
+	})
+}
+
+func TestUpdateUser(t *testing.T) {
+	t.Run("success case", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("UpdateUser", int64(1), "testuser", "test@example.com", mock.Anything).
+			Return(nil)
+
+		service := NewUserService(mockRepo)
+
+		err := service.UpdateUser(1, "testuser", "test@example.com", "password")
+		assert.NoError(t, err)
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("invalid case - repository error", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("UpdateUser", int64(1), "testuser", "test@example.com", mock.Anything).
+			Return(errors.New("repository error"))
+
+		service := NewUserService(mockRepo)
+
+		err := service.UpdateUser(1, "testuser", "test@example.com", "password")
+		assert.Error(t, err)
+		assert.Equal(t, "repository error", err.Error())
+		mockRepo.AssertExpectations(t)
+	})
+}
+
+func TestDeleteUser(t *testing.T) {
+	t.Run("success case", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("DeleteUser", int64(1)).
+			Return(nil)
+
+		service := NewUserService(mockRepo)
+
+		err := service.DeleteUser(1)
+		assert.NoError(t, err)
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("invalid case - repository error", func(t *testing.T) {
+		mockRepo := mocks.NewUserRepository(t)
+
+		mockRepo.
+			On("DeleteUser", int64(1)).
+			Return(errors.New("repository error"))
+
+		service := NewUserService(mockRepo)
+
+		err := service.DeleteUser(1)
+		assert.Error(t, err)
+		assert.Equal(t, "repository error", err.Error())
+		mockRepo.AssertExpectations(t)
+	})
+}
