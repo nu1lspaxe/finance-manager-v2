@@ -1,22 +1,29 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"users/server"
 
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/spf13/viper"
 )
 
-func main() {
-	certFile := os.Getenv("CERT_FILE")
-	keyFile := os.Getenv("KEY_FILE")
+func init() {
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.ReadInConfig()
+}
 
-	server, err := server.NewServer(certFile, keyFile)
+func main() {
+	app, err := server.NewApplication()
 	if err != nil {
-		panic(err)
+		fmt.Printf("failed to start application: %v", err)
+		os.Exit(1)
 	}
 
-	if err := server.Run(certFile, keyFile); err != nil {
-		panic(err)
+	if err := app.Run(); err != nil {
+		fmt.Printf("failed to run application: %v", err)
+		os.Exit(1)
 	}
 }

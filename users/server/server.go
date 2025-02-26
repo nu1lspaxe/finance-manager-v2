@@ -3,112 +3,47 @@ package server
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 	"users/pkg"
+	"users/proto"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
-type Server struct {
-	echoServer *echo.Echo
-	grpcServer *grpc.Server
-	logger     *zap.Logger
+type GrpcServer struct {
+	server *grpc.Server
+	logger *zap.Logger
 }
 
-func NewServer(certFile, keyFile string) (*Server, error) {
-	logger, err := NewZapLogger()
-	if err != nil {
-		return nil, err
-	}
-
-	zap.ReplaceGlobals(logger)
-	defer logger.Sync()
-
-	tlsConfig, err := LoadTLSConfig(certFile, keyFile)
-	if err != nil {
-		return nil, err
-	}
-
-	echoServer := NewEchoServer(tlsConfig, logger)
-
-	grpcServer := NewGrpcServer(tlsConfig, logger)
-
-	return &Server{
-		echoServer: echoServer,
-		grpcServer: grpcServer,
-		logger:     logger,
-	}, nil
+type HttpGateway struct {
+	mux    *runtime.ServeMux
+	logger *zap.Logger
 }
 
-func (s *Server) Run(certFile, keyFile string) error {
-	pool, err := SetPGConn(context.Background())
-	if err != nil {
-		s.logger.Fatal("failed to set up PostgreSQL connection", zap.Error(err))
-	}
-	defer pool.Close()
-
-	repo := pkg.NewUserRepository(pool)
-	service := pkg.NewUserService(repo)
-	pkg.NewUserController(s.grpcServer, service)
-
-	go func() {
-		if err := s.echoServer.Server.ListenAndServeTLS(certFile, keyFile); err != http.ErrServerClosed {
-			s.logger.Fatal("failed to listen and serve Echo", zap.Error(err))
-		}
-	}()
-
-	lis, err := net.Listen("tcp", ":9443")
-	if err != nil {
-		s.logger.Fatal("failed to listen", zap.Error(err))
-	}
-	go func() {
-		if err := s.grpcServer.Serve(lis); err != nil {
-			s.logger.Fatal("failed to serve", zap.Error(err))
-		}
-	}()
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
-	<-quit
-
-	s.shutdown()
-	return nil
-
+type Application struct {
+	grpcServer *GrpcServer
+	gateway    *HttpGateway
+	Logger     *zap.Logger
 }
 
-func (s *Server) shutdown() {
-	s.logger.Info("Shutting down servers...")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := s.echoServer.Shutdown(ctx); err != nil {
-		s.logger.Error("Error shutting down Echo server", zap.Error(err))
-	}
-
-	s.grpcServer.GracefulStop()
-
-	s.logger.Info("Servers shut down successfully")
-}
-
-func NewGrpcServer(tlsConfig *tls.Config, logger *zap.Logger) *grpc.Server {
+func NewGrpcServer(tlsConfig *tls.Config, logger *zap.Logger) *GrpcServer {
 	opts := []logging.Option{
 		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
 	}
-
 	creds := credentials.NewTLS(tlsConfig)
 
-	g := grpc.NewServer(
+	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(InterceptorLogger(logger), opts...),
 		),
@@ -118,36 +53,127 @@ func NewGrpcServer(tlsConfig *tls.Config, logger *zap.Logger) *grpc.Server {
 		grpc.Creds(creds),
 	)
 
-	reflection.Register(g)
-
-	return g
+	reflection.Register(server)
+	return &GrpcServer{
+		server: server,
+		logger: logger,
+	}
 }
 
-func NewEchoServer(tlsConfig *tls.Config, logger *zap.Logger) *echo.Echo {
-	e := echo.New()
+func NewHttpGateway(logger *zap.Logger) *HttpGateway {
+	return &HttpGateway{
+		mux:    runtime.NewServeMux(),
+		logger: logger,
+	}
+}
 
-	e.Use(middleware.RequestID())
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogURI:    true,
-		LogStatus: true,
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			logger.Info("request",
-				zap.String("URI", v.URI),
-				zap.Int("status", v.Status),
-			)
+func NewApplication() (*Application, error) {
+	logger, err := NewZapLogger()
+	if err != nil {
+		return nil, err
+	}
+	zap.ReplaceGlobals(logger)
 
-			return nil
-		},
-	}))
-	e.Use(middleware.Recover())
-
-	if tlsConfig != nil {
-		e.Server = &http.Server{
-			Addr:      ":8443",
-			Handler:   e,
-			TLSConfig: tlsConfig,
-		}
+	tlsConfig, err := LoadTLSConfig()
+	if err != nil {
+		return nil, err
 	}
 
-	return e
+	grpcServer := NewGrpcServer(tlsConfig, logger)
+	gateway := NewHttpGateway(logger)
+
+	return &Application{
+		grpcServer: grpcServer,
+		gateway:    gateway,
+		Logger:     logger,
+	}, nil
+}
+
+func (g *GrpcServer) Start(lis net.Listener) error {
+	return g.server.Serve(lis)
+}
+
+func (h *HttpGateway) Start(ctx context.Context, httpAddr string, grpcAddr string) error {
+	tlsConfig, err := LoadTLSConfig()
+	if err != nil {
+		return err
+	}
+
+	creds := credentials.NewTLS(&tls.Config{
+		InsecureSkipVerify: false,
+		RootCAs:            tlsConfig.RootCAs,
+	})
+
+	err = proto.RegisterUserServiceHandlerFromEndpoint(
+		ctx,
+		h.mux,
+		fmt.Sprintf(":%s", grpcAddr),
+		[]grpc.DialOption{grpc.WithTransportCredentials(creds)},
+	)
+	if err != nil {
+		return err
+	}
+
+	httpServer := &http.Server{
+		Addr:      fmt.Sprintf(":%s", httpAddr),
+		Handler:   h.mux,
+		TLSConfig: tlsConfig,
+	}
+
+	return httpServer.ListenAndServeTLS("", "")
+}
+
+func (a *Application) Run() error {
+	defer a.Logger.Sync()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	connStr := viper.GetString("postgres.connection_string")
+	grpcPort := viper.GetString("ports.grpc")
+	httpPort := viper.GetString("ports.http")
+
+	pool, err := SetPGConn(ctx, connStr)
+	if err != nil {
+		return err
+	}
+	defer pool.Close()
+
+	grpcLis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
+	if err != nil {
+		return err
+	}
+	errChan := make(chan error, 2)
+
+	go func() {
+		if err := a.grpcServer.Start(grpcLis); err != nil && err != grpc.ErrServerStopped {
+			errChan <- err
+		}
+	}()
+
+	go func() {
+		if err := a.gateway.Start(ctx, httpPort, grpcPort); err != nil && err != http.ErrServerClosed {
+			errChan <- err
+		}
+	}()
+
+	repo := pkg.NewUserRepository(pool)
+	service := pkg.NewUserService(repo)
+	controller := pkg.NewUserController(service)
+	proto.RegisterUserServiceServer(a.grpcServer.server, controller)
+
+	a.Logger.Info("server started", zap.String("grpc", grpcPort), zap.String("http", httpPort))
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case err := <-errChan:
+		a.grpcServer.server.GracefulStop()
+		return err
+	case <-quit:
+		a.grpcServer.server.GracefulStop()
+	}
+
+	return nil
 }

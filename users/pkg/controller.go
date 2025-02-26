@@ -4,8 +4,6 @@ import (
 	"context"
 	"users/proto"
 	"users/utils"
-
-	"google.golang.org/grpc"
 )
 
 type UserController struct {
@@ -13,9 +11,8 @@ type UserController struct {
 	proto.UnimplementedUserServiceServer
 }
 
-func NewUserController(server *grpc.Server, service *UserService) {
-	controller := &UserController{service: service}
-	proto.RegisterUserServiceServer(server, controller)
+func NewUserController(service *UserService) *UserController {
+	return &UserController{service: service}
 }
 
 func (c *UserController) CreateUser(context context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {

@@ -2,13 +2,12 @@ package server
 
 import (
 	"context"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func SetPGConn(ctx context.Context) (*pgxpool.Pool, error) {
-	pool, err := pgxpool.New(ctx, os.Getenv("POSTGRES_URL"))
+func SetPGConn(ctx context.Context, dbLink string) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(ctx, dbLink)
 	if err != nil {
 		return nil, err
 	}
