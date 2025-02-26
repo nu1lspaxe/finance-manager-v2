@@ -21,7 +21,7 @@ SELECT * FROM "User" WHERE id = $1;
 -- name: GetUserByEmail :one
 SELECT * FROM "User" WHERE email = $1;
 
--- name: ListUsers :many
+-- name: GetAllUsers :many
 SELECT * FROM "User" ORDER BY created_at;
 
 -- name: UpdateUser :exec

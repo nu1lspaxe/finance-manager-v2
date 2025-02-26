@@ -117,7 +117,7 @@ func TestListUsers(t *testing.T) {
 
 		service := NewUserService(mockRepo)
 
-		_, err := service.ListUsers(1, 10)
+		_, err := service.GetAllUsers(1, 10)
 		assert.NoError(t, err)
 		mockRepo.AssertExpectations(t)
 	})
@@ -131,7 +131,7 @@ func TestListUsers(t *testing.T) {
 
 		service := NewUserService(mockRepo)
 
-		_, err := service.ListUsers(1, 10)
+		_, err := service.GetAllUsers(1, 10)
 		assert.Error(t, err)
 		assert.Equal(t, "repository error", err.Error())
 		mockRepo.AssertExpectations(t)

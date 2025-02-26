@@ -45,8 +45,8 @@ func (u *UserService) GetUser(userId int64) (*sqlc.User, error) {
 	return &user, nil
 }
 
-func (u *UserService) ListUsers(page, pagesize uint32) (*[]sqlc.User, error) {
-	users, err := u.repo.ListUsers()
+func (u *UserService) GetAllUsers(page, pagesize uint32) (*[]sqlc.User, error) {
+	users, err := u.repo.GetAllUsers()
 	if err != nil {
 		return nil, err
 	}

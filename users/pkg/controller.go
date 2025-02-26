@@ -31,8 +31,8 @@ func (c *UserController) GetUser(context context.Context, req *proto.GetUserRequ
 	return &proto.GetUserResponse{User: utils.SqlcToProto(*user)}, nil
 }
 
-func (c *UserController) ListUsers(context context.Context, req *proto.ListUsersRequest) (*proto.ListUsersResponse, error) {
-	users, err := c.service.ListUsers(req.Page, req.PageSize)
+func (c *UserController) GetAllUsers(context context.Context, req *proto.GetAllUsersRequest) (*proto.GetAllUsersResponse, error) {
+	users, err := c.service.GetAllUsers(req.Page, req.PageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *UserController) ListUsers(context context.Context, req *proto.ListUsers
 	for _, user := range *users {
 		protoUsers = append(protoUsers, utils.SqlcToProto(user))
 	}
-	return &proto.ListUsersResponse{Users: protoUsers}, nil
+	return &proto.GetAllUsersResponse{Users: protoUsers}, nil
 }
 
 func (c *UserController) UpdateUser(context context.Context, req *proto.UpdateUserRequest) (*proto.UpdateUserResponse, error) {

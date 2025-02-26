@@ -115,6 +115,36 @@ func (_m *UserRepository) DeleteUser(id int64) error {
 	return r0
 }
 
+// GetAllUsers provides a mock function with no fields
+func (_m *UserRepository) GetAllUsers() ([]sqlc.User, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllUsers")
+	}
+
+	var r0 []sqlc.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]sqlc.User, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []sqlc.User); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]sqlc.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetUserByEmail provides a mock function with given fields: email
 func (_m *UserRepository) GetUserByEmail(email string) (sqlc.User, error) {
 	ret := _m.Called(email)
@@ -164,36 +194,6 @@ func (_m *UserRepository) GetUserById(id int64) (sqlc.User, error) {
 
 	if rf, ok := ret.Get(1).(func(int64) error); ok {
 		r1 = rf(id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// ListUsers provides a mock function with no fields
-func (_m *UserRepository) ListUsers() ([]sqlc.User, error) {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListUsers")
-	}
-
-	var r0 []sqlc.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]sqlc.User, error)); ok {
-		return rf()
-	}
-	if rf, ok := ret.Get(0).(func() []sqlc.User); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.User)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
 	} else {
 		r1 = ret.Error(1)
 	}
