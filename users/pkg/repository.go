@@ -11,7 +11,8 @@ type UserRepository interface {
 	CreateUser(username, email, password string) (sqlc.User, error)
 	CheckUserExists(id int64) (bool, error)
 	CheckUserEmailExists(email string) (bool, error)
-	GetUser(id int64) (sqlc.User, error)
+	GetUserById(id int64) (sqlc.User, error)
+	GetUserByEmail(email string) (sqlc.User, error)
 	ListUsers() ([]sqlc.User, error)
 	UpdateUser(id int64, username, email string, password string) error
 	DeleteUser(id int64) error
@@ -57,8 +58,16 @@ func (u *userRepositoryImpl) CheckUserEmailExists(email string) (bool, error) {
 	return exists, nil
 }
 
-func (u *userRepositoryImpl) GetUser(id int64) (sqlc.User, error) {
+func (u *userRepositoryImpl) GetUserById(id int64) (sqlc.User, error) {
 	user, err := u.queries.GetUserById(context.Background(), id)
+	if err != nil {
+		return sqlc.User{}, err
+	}
+	return user, nil
+}
+
+func (u *userRepositoryImpl) GetUserByEmail(email string) (sqlc.User, error) {
+	user, err := u.queries.GetUserByEmail(context.Background(), email)
 	if err != nil {
 		return sqlc.User{}, err
 	}

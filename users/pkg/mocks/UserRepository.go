@@ -115,12 +115,40 @@ func (_m *UserRepository) DeleteUser(id int64) error {
 	return r0
 }
 
-// GetUser provides a mock function with given fields: id
-func (_m *UserRepository) GetUser(id int64) (sqlc.User, error) {
+// GetUserByEmail provides a mock function with given fields: email
+func (_m *UserRepository) GetUserByEmail(email string) (sqlc.User, error) {
+	ret := _m.Called(email)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetUserByEmail")
+	}
+
+	var r0 sqlc.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (sqlc.User, error)); ok {
+		return rf(email)
+	}
+	if rf, ok := ret.Get(0).(func(string) sqlc.User); ok {
+		r0 = rf(email)
+	} else {
+		r0 = ret.Get(0).(sqlc.User)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(email)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetUserById provides a mock function with given fields: id
+func (_m *UserRepository) GetUserById(id int64) (sqlc.User, error) {
 	ret := _m.Called(id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetUser")
+		panic("no return value specified for GetUserById")
 	}
 
 	var r0 sqlc.User

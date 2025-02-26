@@ -38,7 +38,7 @@ func (u *UserService) CreateUser(username, email, password string) (*sqlc.User, 
 }
 
 func (u *UserService) GetUser(userId int64) (*sqlc.User, error) {
-	user, err := u.repo.GetUser(userId)
+	user, err := u.repo.GetUserById(userId)
 	if err != nil {
 		return nil, err
 	}
