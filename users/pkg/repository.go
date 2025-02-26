@@ -8,7 +8,7 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(username, email string) (sqlc.User, error)
+	CreateUser(username, email, password string) (sqlc.User, error)
 	CheckUserExists(id int64) (bool, error)
 	CheckUserEmailExists(email string) (bool, error)
 	GetUser(id int64) (sqlc.User, error)
@@ -29,10 +29,11 @@ func NewUserRepository(pool *pgxpool.Pool) UserRepository {
 	}
 }
 
-func (u *userRepositoryImpl) CreateUser(username, email string) (sqlc.User, error) {
+func (u *userRepositoryImpl) CreateUser(username, email, password string) (sqlc.User, error) {
 	user, err := u.queries.CreateUser(context.Background(), sqlc.CreateUserParams{
 		Username: username,
 		Email:    email,
+		Password: password,
 	})
 	if err != nil {
 		return sqlc.User{}, err

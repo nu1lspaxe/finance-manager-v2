@@ -13,7 +13,7 @@ func NewUserService(repo UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (u *UserService) CreateUser(username, email string) (*sqlc.User, error) {
+func (u *UserService) CreateUser(username, email, password string) (*sqlc.User, error) {
 	if username == "" || email == "" {
 		return nil, utils.NewUserError(utils.USER_INVALID, "Username and email are required")
 	}
@@ -25,7 +25,12 @@ func (u *UserService) CreateUser(username, email string) (*sqlc.User, error) {
 		return nil, utils.NewUserError(utils.USER_EXISTS, "User already exists")
 	}
 
-	user, err := u.repo.CreateUser(username, email)
+	hashPassword, err := utils.HashPassword(password)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := u.repo.CreateUser(username, email, hashPassword)
 	if err != nil {
 		return nil, err
 	}

@@ -16,7 +16,7 @@ func NewUserController(service *UserService) *UserController {
 }
 
 func (c *UserController) CreateUser(context context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
-	user, err := c.service.CreateUser(req.Username, req.Email)
+	user, err := c.service.CreateUser(req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
