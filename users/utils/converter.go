@@ -4,8 +4,6 @@ import (
 	"users/proto"
 
 	"users/postgres/sqlc"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func SqlcToProto(user sqlc.User) *proto.User {
@@ -14,7 +12,7 @@ func SqlcToProto(user sqlc.User) *proto.User {
 		Username:  user.Username,
 		Email:     user.Email,
 		Password:  user.Password,
-		CreatedAt: timestamppb.New(user.CreatedAt.Time),
-		UpdatedAt: timestamppb.New(user.UpdatedAt.Time),
+		CreatedAt: user.CreatedAt.Time.Unix(),
+		UpdatedAt: user.UpdatedAt.Time.Unix(),
 	}
 }

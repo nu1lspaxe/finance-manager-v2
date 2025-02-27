@@ -4,7 +4,6 @@ package users;
 
 option go_package = "finance_manager/proto/users;proto";
 
-import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "buf/validate/validate.proto";
 
@@ -55,8 +54,8 @@ message User {
     string username = 2;
     string email = 3;
     string password = 4;
-    google.protobuf.Timestamp created_at = 5;
-    google.protobuf.Timestamp updated_at = 6;
+    int64 created_at = 5;
+    int64 updated_at = 6;
 }
 
 message CreateUserRequest {
@@ -124,7 +123,7 @@ message LoginRequest {
 
 message LoginResponse {
     string token = 1;
-    google.protobuf.Timestamp expires_at = 2;
+    int64 expires_at = 2;
 }
 
 message LogoutRequest {
