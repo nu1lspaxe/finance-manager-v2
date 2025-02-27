@@ -12,3 +12,5 @@ plugins:
     out: proto
     opt:
       - paths=source_relative
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.26.1
+    out: proto/openapiv2

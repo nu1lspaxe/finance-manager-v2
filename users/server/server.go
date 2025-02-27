@@ -114,6 +114,8 @@ func (h *HttpGateway) Start(ctx context.Context, httpAddr string, grpcAddr strin
 		return err
 	}
 
+	h.mux.HandlePath("GET", "/openapiv2/*", openAPIServer("proto/openapiv2"))
+
 	httpServer := &http.Server{
 		Addr:      fmt.Sprintf(":%s", httpAddr),
 		Handler:   h.mux,
