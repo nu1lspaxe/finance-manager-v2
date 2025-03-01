@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package records;
+
+option go_package = "finance_manager/proto/records;proto";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service RecordService {
+  rpc CreateRecord (CreateRecordRequest) returns (RecordResponse) {
+    option (google.api.http) = {
+      post: "/v1/records"
+      body: "*"
+    };
+  }
+
+  rpc GetRecord (GetRecordRequest) returns (RecordResponse) {
+    option (google.api.http) = {
+      get: "/v1/records/{id}"
+    };
+  }
+
+  // /v1/records/user?user_id&record_type&start_time&end_time
+  rpc GetUserRecordsWithFilters (GetUserRecordsWithFiltersRequest) returns (stream RecordResponse) {
+    option (google.api.http) = {
+      get: "/v1/records/user"
+    };
+  }
+
+  rpc UpdateRecord (UpdateRecordRequest) returns (UpdateRecordResponse) {
+    option (google.api.http) = {
+      patch: "/v1/records/{id}"
+      body: "*"
+    };
+  }
+  
+  rpc DeleteRecord (DeleteRecordRequest) returns (DeleteRecordResponse) {
+    option (google.api.http) = {
+      delete: "/v1/records/{id}"
+    };
+  }
+}
+
+message Record {
+  int64 id = 1;             
+  int64 user_id = 2;       
+  float amount = 3;  
+  int64 transaction_date = 4;    
+  string record_type = 5;
+  string detail = 6;   
+  int64 created_at = 7;
+  int64 updated_at = 8;   
+}
+
+message CreateRecordRequest {
+  int64 user_id = 1;
+  float amount = 2;
+  string record_type = 3;
+  int64 transaction_date = 4;
+  string detail = 5;
+}
+
+message GetRecordRequest {
+  int64 id = 1;
+}
+
+message GetUserRecordsWithFiltersRequest {
+  int64 user_id = 1;
+  string record_type = 2;
+  int64 start_time = 3;
+  int64 end_time = 4;
+}
+
+message UpdateRecordRequest {
+  int64 id = 1;
+  float amount = 2;
+  string record_type = 3;
+  int64 transaction_date = 4;
+  string detail = 5;
+}
+
+message DeleteRecordRequest {
+  int64 id = 1;
+}
+
+message RecordResponse {
+  Record record = 1;
+}
+
+message UpdateRecordResponse {
+  bool success = 1;
+}
+
+message DeleteRecordResponse {
+  bool success = 1;
+}
