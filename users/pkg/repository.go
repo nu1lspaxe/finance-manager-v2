@@ -13,7 +13,7 @@ type UserRepository interface {
 	CheckUserEmailExists(email string) (bool, error)
 	GetUserById(id int64) (sqlc.User, error)
 	GetUserByEmail(email string) (sqlc.User, error)
-	GetAllUsers() ([]sqlc.User, error)
+	GetAllUsers(page, pagesize int32) ([]sqlc.User, error)
 	UpdateUser(id int64, username, email string, password string) error
 	DeleteUser(id int64) error
 }
@@ -74,8 +74,13 @@ func (u *userRepositoryImpl) GetUserByEmail(email string) (sqlc.User, error) {
 	return user, nil
 }
 
-func (u *userRepositoryImpl) GetAllUsers() ([]sqlc.User, error) {
-	users, err := u.queries.GetAllUsers(context.Background())
+func (u *userRepositoryImpl) GetAllUsers(page, pagesize int32) ([]sqlc.User, error) {
+	offset := page * pagesize
+
+	users, err := u.queries.GetAllUsers(context.Background(), sqlc.GetAllUsersParams{
+		Limit:  pagesize,
+		Offset: offset,
+	})
 	if err != nil {
 		return nil, err
 	}

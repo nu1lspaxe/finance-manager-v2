@@ -8,13 +8,13 @@ import "google/api/annotations.proto";
 import "buf/validate/validate.proto";
 
 service UserService {
-    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    rpc CreateUser(CreateUserRequest) returns (UserResponse) {
         option (google.api.http) = {
             post: "/v1/users"
             body: "*"
         };
     }
-    rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    rpc GetUser(GetUserRequest) returns (UserResponse) {
         option (google.api.http) = {
             get: "/v1/users/{id}"
         };
@@ -35,18 +35,18 @@ service UserService {
             delete: "/v1/users/{id}"
         };
     }
-    rpc Login(LoginRequest) returns (LoginResponse) {
-        option (google.api.http) = {
-            post: "/v1/users/login"
-            body: "*"
-        };
-    }
-    rpc Logout(LogoutRequest) returns (LogoutResponse) {
-        option (google.api.http) = {
-            post: "/v1/users/logout"
-            body: "*"
-        };
-    }
+    // rpc Login(LoginRequest) returns (LoginResponse) {
+    //     option (google.api.http) = {
+    //         post: "/v1/users/login"
+    //         body: "*"
+    //     };
+    // }
+    // rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    //     option (google.api.http) = {
+    //         post: "/v1/users/logout"
+    //         body: "*"
+    //     };
+    // }
 }
 
 message User {
@@ -68,21 +68,17 @@ message CreateUserRequest {
     string password = 4;
 }
 
-message CreateUserResponse {
-    User user = 1;
-}
-
 message GetUserRequest {
     int64 id = 1;
 }
 
-message GetUserResponse {
+message UserResponse {
     User user = 1;
 }
 
 message GetAllUsersRequest {
-    uint32 page = 1 [(buf.validate.field).uint32 = {gt: 0}];
-    uint32 page_size = 2 [(buf.validate.field).uint32 = {gt: 1}];
+    int32 page = 1 [(buf.validate.field).int32 = {gt: 0}];
+    int32 page_size = 2 [(buf.validate.field).int32 = {gt: 1}];
 }
 
 message GetAllUsersResponse {

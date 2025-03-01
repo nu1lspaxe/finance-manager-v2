@@ -115,9 +115,9 @@ func (_m *UserRepository) DeleteUser(id int64) error {
 	return r0
 }
 
-// GetAllUsers provides a mock function with no fields
-func (_m *UserRepository) GetAllUsers() ([]sqlc.User, error) {
-	ret := _m.Called()
+// GetAllUsers provides a mock function with given fields: page, pagesize
+func (_m *UserRepository) GetAllUsers(page int32, pagesize int32) ([]sqlc.User, error) {
+	ret := _m.Called(page, pagesize)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAllUsers")
@@ -125,19 +125,19 @@ func (_m *UserRepository) GetAllUsers() ([]sqlc.User, error) {
 
 	var r0 []sqlc.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]sqlc.User, error)); ok {
-		return rf()
+	if rf, ok := ret.Get(0).(func(int32, int32) ([]sqlc.User, error)); ok {
+		return rf(page, pagesize)
 	}
-	if rf, ok := ret.Get(0).(func() []sqlc.User); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(int32, int32) []sqlc.User); ok {
+		r0 = rf(page, pagesize)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]sqlc.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(int32, int32) error); ok {
+		r1 = rf(page, pagesize)
 	} else {
 		r1 = ret.Error(1)
 	}

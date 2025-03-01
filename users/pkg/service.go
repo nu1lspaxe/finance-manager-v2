@@ -22,7 +22,7 @@ func (u *UserService) CreateUser(username, email, password string) (*sqlc.User, 
 		return nil, err
 	}
 	if exists {
-		return nil, utils.NewUserError(utils.USER_EXISTS, "User already exists")
+		return nil, utils.NewUserError(utils.USER_EMAIL_EXISTS, "Email already exists")
 	}
 
 	hashPassword, err := utils.HashPassword(password)
@@ -45,8 +45,8 @@ func (u *UserService) GetUser(userId int64) (*sqlc.User, error) {
 	return &user, nil
 }
 
-func (u *UserService) GetAllUsers(page, pagesize uint32) (*[]sqlc.User, error) {
-	users, err := u.repo.GetAllUsers()
+func (u *UserService) GetAllUsers(page, pagesize int32) (*[]sqlc.User, error) {
+	users, err := u.repo.GetAllUsers(page, pagesize)
 	if err != nil {
 		return nil, err
 	}

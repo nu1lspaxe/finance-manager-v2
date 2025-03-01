@@ -39,14 +39,14 @@
             "in": "query",
             "required": false,
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
           {
             "name": "pageSize",
             "in": "query",
             "required": false,
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           }
         ],
         "tags": [
@@ -59,7 +59,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersCreateUserResponse"
+              "$ref": "#/definitions/usersUserResponse"
             }
           },
           "default": {
@@ -84,70 +84,6 @@
         ]
       }
     },
-    "/v1/users/login": {
-      "post": {
-        "operationId": "UserService_Login",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/usersLoginResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/usersLoginRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
-    "/v1/users/logout": {
-      "post": {
-        "operationId": "UserService_Logout",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/usersLogoutResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/usersLogoutRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
     "/v1/users/{id}": {
       "get": {
         "operationId": "UserService_GetUser",
@@ -155,7 +91,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersGetUserResponse"
+              "$ref": "#/definitions/usersUserResponse"
             }
           },
           "default": {
@@ -303,14 +239,6 @@
         }
       }
     },
-    "usersCreateUserResponse": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/usersUser"
-        }
-      }
-    },
     "usersDeleteUserResponse": {
       "type": "object",
       "properties": {
@@ -328,53 +256,6 @@
             "type": "object",
             "$ref": "#/definitions/usersUser"
           }
-        }
-      }
-    },
-    "usersGetUserResponse": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/usersUser"
-        }
-      }
-    },
-    "usersLoginRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "usersLoginResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        },
-        "expiresAt": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
-    "usersLogoutRequest": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "usersLogoutResponse": {
-      "type": "object",
-      "properties": {
-        "success": {
-          "type": "boolean"
         }
       }
     },
@@ -409,6 +290,14 @@
         "updatedAt": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "usersUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/usersUser"
         }
       }
     }

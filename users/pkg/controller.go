@@ -15,20 +15,20 @@ func NewUserController(service *UserService) *UserController {
 	return &UserController{service: service}
 }
 
-func (c *UserController) CreateUser(context context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
+func (c *UserController) CreateUser(context context.Context, req *proto.CreateUserRequest) (*proto.UserResponse, error) {
 	user, err := c.service.CreateUser(req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.CreateUserResponse{User: utils.SqlcToProto(*user)}, nil
+	return &proto.UserResponse{User: utils.SqlcToProto(*user)}, nil
 }
 
-func (c *UserController) GetUser(context context.Context, req *proto.GetUserRequest) (*proto.GetUserResponse, error) {
+func (c *UserController) GetUser(context context.Context, req *proto.GetUserRequest) (*proto.UserResponse, error) {
 	user, err := c.service.GetUser(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.GetUserResponse{User: utils.SqlcToProto(*user)}, nil
+	return &proto.UserResponse{User: utils.SqlcToProto(*user)}, nil
 }
 
 func (c *UserController) GetAllUsers(context context.Context, req *proto.GetAllUsersRequest) (*proto.GetAllUsersResponse, error) {

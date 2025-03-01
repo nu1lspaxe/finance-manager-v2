@@ -73,11 +73,16 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, username, email, password, created_at, updated_at FROM "User" ORDER BY created_at
+SELECT id, username, email, password, created_at, updated_at FROM "User" ORDER BY created_at OFFSET $1 LIMIT $2
 `
 
-func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.Query(ctx, getAllUsers)
+type GetAllUsersParams struct {
+	Offset int32 `json:"offset"`
+	Limit  int32 `json:"limit"`
+}
+
+func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]User, error) {
+	rows, err := q.db.Query(ctx, getAllUsers, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}

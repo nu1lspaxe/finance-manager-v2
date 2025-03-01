@@ -32,7 +32,7 @@ func TestCreateUser(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("invalid case - email already exists", func(t *testing.T) {
+	t.Run("error case - email already exists", func(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -46,7 +46,7 @@ func TestCreateUser(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("invalid case - repository error", func(t *testing.T) {
+	t.Run("error case - repository error", func(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -84,7 +84,7 @@ func TestGetUser(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("invalid case - repository error", func(t *testing.T) {
+	t.Run("error case - repository error", func(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -122,7 +122,7 @@ func TestListUsers(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("invalid case - repository error", func(t *testing.T) {
+	t.Run("error case - repository error", func(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -153,7 +153,7 @@ func TestUpdateUser(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("invalid case - repository error", func(t *testing.T) {
+	t.Run("error case - repository error", func(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -184,7 +184,7 @@ func TestDeleteUser(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("invalid case - repository error", func(t *testing.T) {
+	t.Run("error case - repository error", func(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.

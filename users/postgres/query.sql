@@ -22,7 +22,7 @@ SELECT * FROM "User" WHERE id = $1;
 SELECT * FROM "User" WHERE email = $1;
 
 -- name: GetAllUsers :many
-SELECT * FROM "User" ORDER BY created_at;
+SELECT * FROM "User" ORDER BY created_at OFFSET $1 LIMIT $2;
 
 -- name: UpdateUser :exec
 UPDATE "User" SET username = $2, email = $3, password = $4, updated_at = NOW() WHERE id = $1;
