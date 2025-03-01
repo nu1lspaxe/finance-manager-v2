@@ -16,7 +16,7 @@ func init() {
 }
 
 func main() {
-	app, err := server.NewApplication()
+	app, err := server.NewServer()
 	if err != nil {
 		fmt.Printf("failed to start application: %v", err)
 		os.Exit(1)

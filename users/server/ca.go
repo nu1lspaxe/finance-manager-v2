@@ -39,10 +39,11 @@ func LoadTLSConfig() (*tls.Config, error) {
 	}
 
 	return &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		NextProtos:   []string{"http/1.1", "h2"},
-		MinVersion:   tls.VersionTLS12,
-		RootCAs:      caCertPool,
+		Certificates:       []tls.Certificate{cert},
+		NextProtos:         []string{"http/1.1", "h2"},
+		MinVersion:         tls.VersionTLS12,
+		RootCAs:            caCertPool,
+		InsecureSkipVerify: false,
 	}, nil
 }
 
