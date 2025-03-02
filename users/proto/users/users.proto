@@ -129,34 +129,34 @@ message UpdateUserRequest {
     string password = 4 [(buf.validate.field) = {
         cel: [
             {
-                id: "password_length",
-                message: "password must be between 12 and 20 characters",
-                expression: "size(this) >= 12 && size(this) <= 20"
+            id: "password_length",
+            message: "password must be between 12 and 20 characters",
+            expression: "size(this) >= 12 && size(this) <= 20"
             },
             {
-                id: "password_uppercase",
-                message: "password must contain at least one uppercase letter",
-                expression: "this.matches('.*[A-Z].*')"
+            id: "password_uppercase",
+            message: "password must contain at least one uppercase letter",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[A-Z][A-Za-z0-9!@#$%^&*()_+-=]*$')"
             },
             {
-                id: "password_lowercase",
-                message: "password must contain at least one lowercase letter",
-                expression: "this.matches('.*[a-z].*')"
+            id: "password_lowercase",
+            message: "password must contain at least one lowercase letter",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[a-z][A-Za-z0-9!@#$%^&*()_+-=]*$')"
             },
             {
-                id: "password_number",
-                message: "password must contain at least one number",
-                expression: "this.matches('.*[0-9].*')"
+            id: "password_number",
+            message: "password must contain at least one number",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[0-9][A-Za-z0-9!@#$%^&*()_+-=]*$')"
             },
             {
-                id: "password_special",
-                message: "password must contain at least one special character",
-                expression: "this.matches('.*[!@#$%^&*()_+-=].*')"
+            id: "password_special",
+            message: "password must contain at least one special character",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[!@#$%^&*()_+-=][A-Za-z0-9!@#$%^&*()_+-=]*$')"
             },
             {
-                id: "password_allowed_chars",
-                message: "password can only contain letters, numbers, and specific special characters",
-                expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*$')"
+            id: "password_allowed_chars",
+            message: "password can only contain letters, numbers, and specific special characters",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*$')"
             }
         ]
     }];
