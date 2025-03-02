@@ -4,6 +4,8 @@ import (
 	"context"
 	"records/proto"
 	"records/utils"
+
+	"github.com/bufbuild/protovalidate-go"
 )
 
 type RecordController struct {
@@ -16,7 +18,12 @@ func NewRecordController(service *RecordService) *RecordController {
 }
 
 func (r *RecordController) CreateRecord(ctx context.Context, req *proto.CreateRecordRequest) (*proto.RecordResponse, error) {
-	record, err := r.service.CreateRecord(req.UserId, req.Amount, req.TransactionDate, req.RecordType, req.Detail)
+	err := protovalidate.Validate(req)
+	if err != nil {
+		return nil, err
+	}
+
+	record, err := r.service.CreateRecord(req.UserId, req.Amount, req.TransactionDate, req.RecordType.String(), req.Detail)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +47,12 @@ func (r *RecordController) GetRecord(ctx context.Context, req *proto.GetRecordRe
 }
 
 func (r *RecordController) GetUserRecordsWithFilters(req *proto.GetUserRecordsWithFiltersRequest, stream proto.RecordService_GetUserRecordsWithFiltersServer) error {
-	records, err := r.service.GetUserRecordsWithFilters(req.UserId, req.RecordType, req.StartTime, req.EndTime)
+	err := protovalidate.Validate(req)
+	if err != nil {
+		return err
+	}
+
+	records, err := r.service.GetUserRecordsWithFilters(req.UserId, req.RecordType.String(), req.StartTime, req.EndTime)
 	if err != nil {
 		return err
 	}
@@ -57,7 +69,12 @@ func (r *RecordController) GetUserRecordsWithFilters(req *proto.GetUserRecordsWi
 }
 
 func (r *RecordController) UpdateRecord(ctx context.Context, req *proto.UpdateRecordRequest) (*proto.UpdateRecordResponse, error) {
-	err := r.service.UpdateRecord(req.Id, req.Amount, req.TransactionDate, req.RecordType, req.Detail)
+	err := protovalidate.Validate(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.service.UpdateRecord(req.Id, req.Amount, req.TransactionDate, req.RecordType.String(), req.Detail)
 	if err != nil {
 		return nil, err
 	}

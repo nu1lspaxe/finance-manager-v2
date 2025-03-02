@@ -46,9 +46,9 @@ service RecordService {
 message Record {
   int64 id = 1;             
   int64 user_id = 2;       
-  float amount = 3;  
+  float amount = 3;
   int64 transaction_date = 4;    
-  string record_type = 5;
+  RecordType record_type = 5;
   string detail = 6;   
   int64 created_at = 7;
   int64 updated_at = 8;   
@@ -56,8 +56,8 @@ message Record {
 
 message CreateRecordRequest {
   int64 user_id = 1;
-  float amount = 2;
-  string record_type = 3;
+  float amount = 2 [(buf.validate.field).float = {gt: 0}];
+  RecordType record_type = 3 [(buf.validate.field).enum.defined_only = true];
   int64 transaction_date = 4;
   string detail = 5;
 }
@@ -68,15 +68,15 @@ message GetRecordRequest {
 
 message GetUserRecordsWithFiltersRequest {
   int64 user_id = 1;
-  string record_type = 2;
+  RecordType record_type = 2 [(buf.validate.field).enum.defined_only = true];
   int64 start_time = 3;
   int64 end_time = 4;
 }
 
 message UpdateRecordRequest {
   int64 id = 1;
-  float amount = 2;
-  string record_type = 3;
+  float amount = 2 [(buf.validate.field).float = {gt: 0}];
+  RecordType record_type = 3 [(buf.validate.field).enum.defined_only = true];
   int64 transaction_date = 4;
   string detail = 5;
 }
@@ -95,4 +95,9 @@ message UpdateRecordResponse {
 
 message DeleteRecordResponse {
   bool success = 1;
+}
+
+enum RecordType {
+  INCOME = 0;
+  EXPENSE = 1;
 }
