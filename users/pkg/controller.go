@@ -4,6 +4,8 @@ import (
 	"context"
 	"users/proto"
 	"users/utils"
+
+	"github.com/bufbuild/protovalidate-go"
 )
 
 type UserController struct {
@@ -16,6 +18,11 @@ func NewUserController(service *UserService) *UserController {
 }
 
 func (c *UserController) CreateUser(context context.Context, req *proto.CreateUserRequest) (*proto.UserResponse, error) {
+	err := protovalidate.Validate(req)
+	if err != nil {
+		return nil, err
+	}
+
 	user, err := c.service.CreateUser(req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, err
@@ -32,6 +39,11 @@ func (c *UserController) GetUser(context context.Context, req *proto.GetUserRequ
 }
 
 func (c *UserController) GetAllUsers(context context.Context, req *proto.GetAllUsersRequest) (*proto.GetAllUsersResponse, error) {
+	err := protovalidate.Validate(req)
+	if err != nil {
+		return nil, err
+	}
+
 	users, err := c.service.GetAllUsers(req.Page, req.PageSize)
 	if err != nil {
 		return nil, err
@@ -45,7 +57,12 @@ func (c *UserController) GetAllUsers(context context.Context, req *proto.GetAllU
 }
 
 func (c *UserController) UpdateUser(context context.Context, req *proto.UpdateUserRequest) (*proto.UpdateUserResponse, error) {
-	err := c.service.UpdateUser(req.Id, req.Username, req.Email, req.Password)
+	err := protovalidate.Validate(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.service.UpdateUser(req.Id, req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}

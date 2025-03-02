@@ -59,13 +59,46 @@ message User {
 }
 
 message CreateUserRequest {
-    string username = 1;
+    string username = 1 [(buf.validate.field).string.min_len = 1];
     string email = 2 [(buf.validate.field).cel = {
         id: "valid_email"
         message: "email must be a valid email"
         expression: "this.isEmail()"
-      }];
-    string password = 4;
+    }];
+    string password = 4 [(buf.validate.field) = {
+        cel: [
+            {
+            id: "password_length",
+            message: "password must be between 12 and 20 characters",
+            expression: "size(this) >= 12 && size(this) <= 20"
+            },
+            {
+            id: "password_uppercase",
+            message: "password must contain at least one uppercase letter",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[A-Z][A-Za-z0-9!@#$%^&*()_+-=]*$')"
+            },
+            {
+            id: "password_lowercase",
+            message: "password must contain at least one lowercase letter",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[a-z][A-Za-z0-9!@#$%^&*()_+-=]*$')"
+            },
+            {
+            id: "password_number",
+            message: "password must contain at least one number",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[0-9][A-Za-z0-9!@#$%^&*()_+-=]*$')"
+            },
+            {
+            id: "password_special",
+            message: "password must contain at least one special character",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[!@#$%^&*()_+-=][A-Za-z0-9!@#$%^&*()_+-=]*$')"
+            },
+            {
+            id: "password_allowed_chars",
+            message: "password can only contain letters, numbers, and specific special characters",
+            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*$')"
+            }
+        ]
+    }];
 }
 
 message GetUserRequest {
@@ -78,7 +111,7 @@ message UserResponse {
 
 message GetAllUsersRequest {
     int32 page = 1 [(buf.validate.field).int32 = {gt: 0}];
-    int32 page_size = 2 [(buf.validate.field).int32 = {gt: 1}];
+    int32 page_size = 2 [(buf.validate.field).int32 = {gt: 0}];
 }
 
 message GetAllUsersResponse {
@@ -87,13 +120,46 @@ message GetAllUsersResponse {
 
 message UpdateUserRequest {
     int64 id = 1;
-    string username = 2;
+    string username = 2 [(buf.validate.field).string.min_len = 1];
     string email = 3 [(buf.validate.field).cel = {
         id: "valid_email"
         message: "email must be a valid email"
         expression: "this.isEmail()"
     }];
-    string password = 4;
+    string password = 4 [(buf.validate.field) = {
+        cel: [
+            {
+                id: "password_length",
+                message: "password must be between 12 and 20 characters",
+                expression: "size(this) >= 12 && size(this) <= 20"
+            },
+            {
+                id: "password_uppercase",
+                message: "password must contain at least one uppercase letter",
+                expression: "this.matches('.*[A-Z].*')"
+            },
+            {
+                id: "password_lowercase",
+                message: "password must contain at least one lowercase letter",
+                expression: "this.matches('.*[a-z].*')"
+            },
+            {
+                id: "password_number",
+                message: "password must contain at least one number",
+                expression: "this.matches('.*[0-9].*')"
+            },
+            {
+                id: "password_special",
+                message: "password must contain at least one special character",
+                expression: "this.matches('.*[!@#$%^&*()_+-=].*')"
+            },
+            {
+                id: "password_allowed_chars",
+                message: "password can only contain letters, numbers, and specific special characters",
+                expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*$')"
+            }
+        ]
+    }];
 }
 
 message UpdateUserResponse {

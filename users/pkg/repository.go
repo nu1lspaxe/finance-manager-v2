@@ -75,7 +75,7 @@ func (u *userRepositoryImpl) GetUserByEmail(email string) (sqlc.User, error) {
 }
 
 func (u *userRepositoryImpl) GetAllUsers(page, pagesize int32) ([]sqlc.User, error) {
-	offset := page * pagesize
+	offset := (page - 1) * pagesize
 
 	users, err := u.queries.GetAllUsers(context.Background(), sqlc.GetAllUsersParams{
 		Limit:  pagesize,
