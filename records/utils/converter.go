@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func SqlcToProto(record *sqlc.Record) (*proto.Record, error) {
+func SqlcToProto(record *sqlc.FianaceManagerRecord) (*proto.Record, error) {
 
 	return &proto.Record{
 		Id:        record.ID,

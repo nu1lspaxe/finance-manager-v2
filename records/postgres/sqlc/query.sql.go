@@ -13,7 +13,7 @@ import (
 
 const createRecord = `-- name: CreateRecord :one
 
-INSERT INTO "Record" (user_id, amount, transaction_date, record_type, detail)
+INSERT INTO "Fianace_Manager.Record" (user_id, amount, transaction_date, record_type, detail)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at
 `
@@ -27,7 +27,7 @@ type CreateRecordParams struct {
 }
 
 // Table: Record
-func (q *Queries) CreateRecord(ctx context.Context, arg CreateRecordParams) (Record, error) {
+func (q *Queries) CreateRecord(ctx context.Context, arg CreateRecordParams) (FianaceManagerRecord, error) {
 	row := q.db.QueryRow(ctx, createRecord,
 		arg.UserID,
 		arg.Amount,
@@ -35,7 +35,7 @@ func (q *Queries) CreateRecord(ctx context.Context, arg CreateRecordParams) (Rec
 		arg.RecordType,
 		arg.Detail,
 	)
-	var i Record
+	var i FianaceManagerRecord
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
@@ -50,7 +50,7 @@ func (q *Queries) CreateRecord(ctx context.Context, arg CreateRecordParams) (Rec
 }
 
 const deleteRecord = `-- name: DeleteRecord :exec
-DELETE FROM "Record" WHERE id = $1
+DELETE FROM "Fianace_Manager.Record" WHERE id = $1
 `
 
 func (q *Queries) DeleteRecord(ctx context.Context, id int64) error {
@@ -59,12 +59,12 @@ func (q *Queries) DeleteRecord(ctx context.Context, id int64) error {
 }
 
 const getRecord = `-- name: GetRecord :one
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record" WHERE id = $1
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record" WHERE id = $1
 `
 
-func (q *Queries) GetRecord(ctx context.Context, id int64) (Record, error) {
+func (q *Queries) GetRecord(ctx context.Context, id int64) (FianaceManagerRecord, error) {
 	row := q.db.QueryRow(ctx, getRecord, id)
-	var i Record
+	var i FianaceManagerRecord
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
@@ -79,18 +79,18 @@ func (q *Queries) GetRecord(ctx context.Context, id int64) (Record, error) {
 }
 
 const getUserRecords = `-- name: GetUserRecords :many
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record" WHERE user_id = $1
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record" WHERE user_id = $1
 `
 
-func (q *Queries) GetUserRecords(ctx context.Context, userID int64) ([]Record, error) {
+func (q *Queries) GetUserRecords(ctx context.Context, userID int64) ([]FianaceManagerRecord, error) {
 	rows, err := q.db.Query(ctx, getUserRecords, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Record
+	var items []FianaceManagerRecord
 	for rows.Next() {
-		var i Record
+		var i FianaceManagerRecord
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -112,7 +112,7 @@ func (q *Queries) GetUserRecords(ctx context.Context, userID int64) ([]Record, e
 }
 
 const getUserRecordsByType = `-- name: GetUserRecordsByType :many
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record"
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record"
 WHERE user_id = $1 AND record_type = $2
 `
 
@@ -121,15 +121,15 @@ type GetUserRecordsByTypeParams struct {
 	RecordType string `json:"record_type"`
 }
 
-func (q *Queries) GetUserRecordsByType(ctx context.Context, arg GetUserRecordsByTypeParams) ([]Record, error) {
+func (q *Queries) GetUserRecordsByType(ctx context.Context, arg GetUserRecordsByTypeParams) ([]FianaceManagerRecord, error) {
 	rows, err := q.db.Query(ctx, getUserRecordsByType, arg.UserID, arg.RecordType)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Record
+	var items []FianaceManagerRecord
 	for rows.Next() {
-		var i Record
+		var i FianaceManagerRecord
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -151,7 +151,7 @@ func (q *Queries) GetUserRecordsByType(ctx context.Context, arg GetUserRecordsBy
 }
 
 const getUserRecordsByTypeFromDate = `-- name: GetUserRecordsByTypeFromDate :many
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record"
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record"
 WHERE user_id = $1 AND record_type = $2 AND transaction_date >= $3
 `
 
@@ -161,15 +161,15 @@ type GetUserRecordsByTypeFromDateParams struct {
 	TransactionDate pgtype.Date `json:"transaction_date"`
 }
 
-func (q *Queries) GetUserRecordsByTypeFromDate(ctx context.Context, arg GetUserRecordsByTypeFromDateParams) ([]Record, error) {
+func (q *Queries) GetUserRecordsByTypeFromDate(ctx context.Context, arg GetUserRecordsByTypeFromDateParams) ([]FianaceManagerRecord, error) {
 	rows, err := q.db.Query(ctx, getUserRecordsByTypeFromDate, arg.UserID, arg.RecordType, arg.TransactionDate)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Record
+	var items []FianaceManagerRecord
 	for rows.Next() {
-		var i Record
+		var i FianaceManagerRecord
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -191,7 +191,7 @@ func (q *Queries) GetUserRecordsByTypeFromDate(ctx context.Context, arg GetUserR
 }
 
 const getUserRecordsByTypeToDate = `-- name: GetUserRecordsByTypeToDate :many
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record"
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record"
 WHERE user_id = $1 AND record_type = $2 AND transaction_date <= $3
 `
 
@@ -201,15 +201,15 @@ type GetUserRecordsByTypeToDateParams struct {
 	TransactionDate pgtype.Date `json:"transaction_date"`
 }
 
-func (q *Queries) GetUserRecordsByTypeToDate(ctx context.Context, arg GetUserRecordsByTypeToDateParams) ([]Record, error) {
+func (q *Queries) GetUserRecordsByTypeToDate(ctx context.Context, arg GetUserRecordsByTypeToDateParams) ([]FianaceManagerRecord, error) {
 	rows, err := q.db.Query(ctx, getUserRecordsByTypeToDate, arg.UserID, arg.RecordType, arg.TransactionDate)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Record
+	var items []FianaceManagerRecord
 	for rows.Next() {
-		var i Record
+		var i FianaceManagerRecord
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -231,7 +231,7 @@ func (q *Queries) GetUserRecordsByTypeToDate(ctx context.Context, arg GetUserRec
 }
 
 const getUserRecordsByTypeWithPeriod = `-- name: GetUserRecordsByTypeWithPeriod :many
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record"
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record"
 WHERE user_id = $1 AND record_type = $2 AND transaction_date BETWEEN $3 AND $4
 `
 
@@ -242,7 +242,7 @@ type GetUserRecordsByTypeWithPeriodParams struct {
 	TransactionDate_2 pgtype.Date `json:"transaction_date_2"`
 }
 
-func (q *Queries) GetUserRecordsByTypeWithPeriod(ctx context.Context, arg GetUserRecordsByTypeWithPeriodParams) ([]Record, error) {
+func (q *Queries) GetUserRecordsByTypeWithPeriod(ctx context.Context, arg GetUserRecordsByTypeWithPeriodParams) ([]FianaceManagerRecord, error) {
 	rows, err := q.db.Query(ctx, getUserRecordsByTypeWithPeriod,
 		arg.UserID,
 		arg.RecordType,
@@ -253,9 +253,9 @@ func (q *Queries) GetUserRecordsByTypeWithPeriod(ctx context.Context, arg GetUse
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Record
+	var items []FianaceManagerRecord
 	for rows.Next() {
-		var i Record
+		var i FianaceManagerRecord
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -277,7 +277,7 @@ func (q *Queries) GetUserRecordsByTypeWithPeriod(ctx context.Context, arg GetUse
 }
 
 const getUserRecordsFromDate = `-- name: GetUserRecordsFromDate :many
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record"
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record"
 WHERE user_id = $1 AND transaction_date >= $2
 `
 
@@ -286,15 +286,15 @@ type GetUserRecordsFromDateParams struct {
 	TransactionDate pgtype.Date `json:"transaction_date"`
 }
 
-func (q *Queries) GetUserRecordsFromDate(ctx context.Context, arg GetUserRecordsFromDateParams) ([]Record, error) {
+func (q *Queries) GetUserRecordsFromDate(ctx context.Context, arg GetUserRecordsFromDateParams) ([]FianaceManagerRecord, error) {
 	rows, err := q.db.Query(ctx, getUserRecordsFromDate, arg.UserID, arg.TransactionDate)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Record
+	var items []FianaceManagerRecord
 	for rows.Next() {
-		var i Record
+		var i FianaceManagerRecord
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -316,7 +316,7 @@ func (q *Queries) GetUserRecordsFromDate(ctx context.Context, arg GetUserRecords
 }
 
 const getUserRecordsToDate = `-- name: GetUserRecordsToDate :many
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record"
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record"
 WHERE user_id = $1 AND transaction_date <= $2
 `
 
@@ -325,15 +325,15 @@ type GetUserRecordsToDateParams struct {
 	TransactionDate pgtype.Date `json:"transaction_date"`
 }
 
-func (q *Queries) GetUserRecordsToDate(ctx context.Context, arg GetUserRecordsToDateParams) ([]Record, error) {
+func (q *Queries) GetUserRecordsToDate(ctx context.Context, arg GetUserRecordsToDateParams) ([]FianaceManagerRecord, error) {
 	rows, err := q.db.Query(ctx, getUserRecordsToDate, arg.UserID, arg.TransactionDate)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Record
+	var items []FianaceManagerRecord
 	for rows.Next() {
-		var i Record
+		var i FianaceManagerRecord
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -355,7 +355,7 @@ func (q *Queries) GetUserRecordsToDate(ctx context.Context, arg GetUserRecordsTo
 }
 
 const getUserRecordsWithPeriod = `-- name: GetUserRecordsWithPeriod :many
-SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Record"
+SELECT id, user_id, amount, transaction_date, record_type, detail, created_at, updated_at FROM "Fianace_Manager.Record"
 WHERE user_id = $1 AND transaction_date BETWEEN $2 AND $3
 `
 
@@ -365,15 +365,15 @@ type GetUserRecordsWithPeriodParams struct {
 	TransactionDate_2 pgtype.Date `json:"transaction_date_2"`
 }
 
-func (q *Queries) GetUserRecordsWithPeriod(ctx context.Context, arg GetUserRecordsWithPeriodParams) ([]Record, error) {
+func (q *Queries) GetUserRecordsWithPeriod(ctx context.Context, arg GetUserRecordsWithPeriodParams) ([]FianaceManagerRecord, error) {
 	rows, err := q.db.Query(ctx, getUserRecordsWithPeriod, arg.UserID, arg.TransactionDate, arg.TransactionDate_2)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Record
+	var items []FianaceManagerRecord
 	for rows.Next() {
-		var i Record
+		var i FianaceManagerRecord
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -395,7 +395,7 @@ func (q *Queries) GetUserRecordsWithPeriod(ctx context.Context, arg GetUserRecor
 }
 
 const updateRecord = `-- name: UpdateRecord :exec
-UPDATE "Record" SET amount = $2, transaction_date = $3, record_type = $4, detail = $5, updated_time = NOW() WHERE id = $1
+UPDATE "Fianace_Manager.Record" SET amount = $2, transaction_date = $3, record_type = $4, detail = $5, updated_time = NOW() WHERE id = $1
 `
 
 type UpdateRecordParams struct {
