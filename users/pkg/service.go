@@ -13,7 +13,7 @@ func NewUserService(repo UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (u *UserService) CreateUser(username, email, password string) (*sqlc.User, error) {
+func (u *UserService) CreateUser(username, email, password string) (*sqlc.FianaceManagerUser, error) {
 	if username == "" || email == "" {
 		return nil, utils.NewUserError(utils.ErrUserInvalid, "Username and email are required")
 	}
@@ -37,7 +37,7 @@ func (u *UserService) CreateUser(username, email, password string) (*sqlc.User, 
 	return &user, nil
 }
 
-func (u *UserService) GetUser(userId int64) (*sqlc.User, error) {
+func (u *UserService) GetUser(userId int64) (*sqlc.FianaceManagerUser, error) {
 	user, err := u.repo.GetUserById(userId)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (u *UserService) GetUser(userId int64) (*sqlc.User, error) {
 	return &user, nil
 }
 
-func (u *UserService) GetAllUsers(page, pagesize int32) (*[]sqlc.User, error) {
+func (u *UserService) GetAllUsers(page, pagesize int32) (*[]sqlc.FianaceManagerUser, error) {
 	users, err := u.repo.GetAllUsers(page, pagesize)
 	if err != nil {
 		return nil, err

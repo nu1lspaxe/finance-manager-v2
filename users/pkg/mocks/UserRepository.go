@@ -70,22 +70,22 @@ func (_m *UserRepository) CheckUserExists(id int64) (bool, error) {
 }
 
 // CreateUser provides a mock function with given fields: username, email, password
-func (_m *UserRepository) CreateUser(username string, email string, password string) (sqlc.User, error) {
+func (_m *UserRepository) CreateUser(username string, email string, password string) (sqlc.FianaceManagerUser, error) {
 	ret := _m.Called(username, email, password)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateUser")
 	}
 
-	var r0 sqlc.User
+	var r0 sqlc.FianaceManagerUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, string, string) (sqlc.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, string, string) (sqlc.FianaceManagerUser, error)); ok {
 		return rf(username, email, password)
 	}
-	if rf, ok := ret.Get(0).(func(string, string, string) sqlc.User); ok {
+	if rf, ok := ret.Get(0).(func(string, string, string) sqlc.FianaceManagerUser); ok {
 		r0 = rf(username, email, password)
 	} else {
-		r0 = ret.Get(0).(sqlc.User)
+		r0 = ret.Get(0).(sqlc.FianaceManagerUser)
 	}
 
 	if rf, ok := ret.Get(1).(func(string, string, string) error); ok {
@@ -116,23 +116,23 @@ func (_m *UserRepository) DeleteUser(id int64) error {
 }
 
 // GetAllUsers provides a mock function with given fields: page, pagesize
-func (_m *UserRepository) GetAllUsers(page int32, pagesize int32) ([]sqlc.User, error) {
+func (_m *UserRepository) GetAllUsers(page int32, pagesize int32) ([]sqlc.FianaceManagerUser, error) {
 	ret := _m.Called(page, pagesize)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAllUsers")
 	}
 
-	var r0 []sqlc.User
+	var r0 []sqlc.FianaceManagerUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int32, int32) ([]sqlc.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(int32, int32) ([]sqlc.FianaceManagerUser, error)); ok {
 		return rf(page, pagesize)
 	}
-	if rf, ok := ret.Get(0).(func(int32, int32) []sqlc.User); ok {
+	if rf, ok := ret.Get(0).(func(int32, int32) []sqlc.FianaceManagerUser); ok {
 		r0 = rf(page, pagesize)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.User)
+			r0 = ret.Get(0).([]sqlc.FianaceManagerUser)
 		}
 	}
 
@@ -146,22 +146,22 @@ func (_m *UserRepository) GetAllUsers(page int32, pagesize int32) ([]sqlc.User, 
 }
 
 // GetUserByEmail provides a mock function with given fields: email
-func (_m *UserRepository) GetUserByEmail(email string) (sqlc.User, error) {
+func (_m *UserRepository) GetUserByEmail(email string) (sqlc.FianaceManagerUser, error) {
 	ret := _m.Called(email)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserByEmail")
 	}
 
-	var r0 sqlc.User
+	var r0 sqlc.FianaceManagerUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (sqlc.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (sqlc.FianaceManagerUser, error)); ok {
 		return rf(email)
 	}
-	if rf, ok := ret.Get(0).(func(string) sqlc.User); ok {
+	if rf, ok := ret.Get(0).(func(string) sqlc.FianaceManagerUser); ok {
 		r0 = rf(email)
 	} else {
-		r0 = ret.Get(0).(sqlc.User)
+		r0 = ret.Get(0).(sqlc.FianaceManagerUser)
 	}
 
 	if rf, ok := ret.Get(1).(func(string) error); ok {
@@ -174,22 +174,22 @@ func (_m *UserRepository) GetUserByEmail(email string) (sqlc.User, error) {
 }
 
 // GetUserById provides a mock function with given fields: id
-func (_m *UserRepository) GetUserById(id int64) (sqlc.User, error) {
+func (_m *UserRepository) GetUserById(id int64) (sqlc.FianaceManagerUser, error) {
 	ret := _m.Called(id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserById")
 	}
 
-	var r0 sqlc.User
+	var r0 sqlc.FianaceManagerUser
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64) (sqlc.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(int64) (sqlc.FianaceManagerUser, error)); ok {
 		return rf(id)
 	}
-	if rf, ok := ret.Get(0).(func(int64) sqlc.User); ok {
+	if rf, ok := ret.Get(0).(func(int64) sqlc.FianaceManagerUser); ok {
 		r0 = rf(id)
 	} else {
-		r0 = ret.Get(0).(sqlc.User)
+		r0 = ret.Get(0).(sqlc.FianaceManagerUser)
 	}
 
 	if rf, ok := ret.Get(1).(func(int64) error); ok {

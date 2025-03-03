@@ -11,7 +11,7 @@ import (
 
 const checkUserEmailExists = `-- name: CheckUserEmailExists :one
 SELECT EXISTS (
-  SELECT 1 FROM "User" WHERE email = $1
+  SELECT 1 FROM "Fianace_Manager.User" WHERE email = $1
 ) AS email_exists
 `
 
@@ -24,7 +24,7 @@ func (q *Queries) CheckUserEmailExists(ctx context.Context, email string) (bool,
 
 const checkUserExists = `-- name: CheckUserExists :one
 SELECT EXISTS (
-  SELECT 1 FROM "User" WHERE id = $1
+  SELECT 1 FROM "Fianace_Manager.User" WHERE id = $1
 ) AS user_exists
 `
 
@@ -37,7 +37,7 @@ func (q *Queries) CheckUserExists(ctx context.Context, id int64) (bool, error) {
 
 const createUser = `-- name: CreateUser :one
 
-INSERT INTO "User" (username, email, password)
+INSERT INTO "Fianace_Manager.User" (username, email, password)
 VALUES ($1, $2, $3)
 RETURNING id, username, email, password, created_at, updated_at
 `
@@ -48,10 +48,10 @@ type CreateUserParams struct {
 	Password string `json:"password"`
 }
 
-// Table: User
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+// Table: Fianace_Manager.User
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (FianaceManagerUser, error) {
 	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.Email, arg.Password)
-	var i User
+	var i FianaceManagerUser
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
@@ -64,7 +64,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM "User" WHERE id = $1
+DELETE FROM "Fianace_Manager.User" WHERE id = $1
 `
 
 func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
@@ -73,7 +73,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, username, email, password, created_at, updated_at FROM "User" ORDER BY created_at OFFSET $1 LIMIT $2
+SELECT id, username, email, password, created_at, updated_at FROM "Fianace_Manager.User" ORDER BY created_at OFFSET $1 LIMIT $2
 `
 
 type GetAllUsersParams struct {
@@ -81,15 +81,15 @@ type GetAllUsersParams struct {
 	Limit  int32 `json:"limit"`
 }
 
-func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]User, error) {
+func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]FianaceManagerUser, error) {
 	rows, err := q.db.Query(ctx, getAllUsers, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	var items []FianaceManagerUser
 	for rows.Next() {
-		var i User
+		var i FianaceManagerUser
 		if err := rows.Scan(
 			&i.ID,
 			&i.Username,
@@ -109,12 +109,12 @@ func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]Use
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, username, email, password, created_at, updated_at FROM "User" WHERE email = $1
+SELECT id, username, email, password, created_at, updated_at FROM "Fianace_Manager.User" WHERE email = $1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (FianaceManagerUser, error) {
 	row := q.db.QueryRow(ctx, getUserByEmail, email)
-	var i User
+	var i FianaceManagerUser
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
@@ -127,12 +127,12 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, username, email, password, created_at, updated_at FROM "User" WHERE id = $1
+SELECT id, username, email, password, created_at, updated_at FROM "Fianace_Manager.User" WHERE id = $1
 `
 
-func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
+func (q *Queries) GetUserById(ctx context.Context, id int64) (FianaceManagerUser, error) {
 	row := q.db.QueryRow(ctx, getUserById, id)
-	var i User
+	var i FianaceManagerUser
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
@@ -145,7 +145,7 @@ func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE "User" SET username = $2, email = $3, password = $4, updated_at = NOW() WHERE id = $1
+UPDATE "Fianace_Manager.User" SET username = $2, email = $3, password = $4, updated_at = NOW() WHERE id = $1
 `
 
 type UpdateUserParams struct {

@@ -1,31 +1,31 @@
--- Table: User 
+-- Table: Fianace_Manager.User 
 
 -- name: CreateUser :one
-INSERT INTO "User" (username, email, password)
+INSERT INTO "Fianace_Manager.User" (username, email, password)
 VALUES ($1, $2, $3)
 RETURNING *;
 
 -- name: CheckUserExists :one
 SELECT EXISTS (
-  SELECT 1 FROM "User" WHERE id = $1
+  SELECT 1 FROM "Fianace_Manager.User" WHERE id = $1
 ) AS user_exists;
 
 -- name: CheckUserEmailExists :one
 SELECT EXISTS (
-  SELECT 1 FROM "User" WHERE email = $1
+  SELECT 1 FROM "Fianace_Manager.User" WHERE email = $1
 ) AS email_exists;
 
 -- name: GetUserById :one
-SELECT * FROM "User" WHERE id = $1;
+SELECT * FROM "Fianace_Manager.User" WHERE id = $1;
 
 -- name: GetUserByEmail :one
-SELECT * FROM "User" WHERE email = $1;
+SELECT * FROM "Fianace_Manager.User" WHERE email = $1;
 
 -- name: GetAllUsers :many
-SELECT * FROM "User" ORDER BY created_at OFFSET $1 LIMIT $2;
+SELECT * FROM "Fianace_Manager.User" ORDER BY created_at OFFSET $1 LIMIT $2;
 
 -- name: UpdateUser :exec
-UPDATE "User" SET username = $2, email = $3, password = $4, updated_at = NOW() WHERE id = $1;
+UPDATE "Fianace_Manager.User" SET username = $2, email = $3, password = $4, updated_at = NOW() WHERE id = $1;
 
 -- name: DeleteUser :exec
-DELETE FROM "User" WHERE id = $1;
+DELETE FROM "Fianace_Manager.User" WHERE id = $1;
