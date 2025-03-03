@@ -1,10 +1,10 @@
 package utils
 
 const (
-	USER_NOT_FOUND    = 1
-	USER_EXISTS       = 2
-	USER_EMAIL_EXISTS = 3
-	USER_INVALID      = 4
+	ErrUserNotFound = iota + 1
+	ErrUserExists
+	ErrUserEmailExists
+	ErrUserInvalid
 )
 
 type UserError struct {

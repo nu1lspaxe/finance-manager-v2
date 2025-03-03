@@ -15,14 +15,14 @@ func NewUserService(repo UserRepository) *UserService {
 
 func (u *UserService) CreateUser(username, email, password string) (*sqlc.User, error) {
 	if username == "" || email == "" {
-		return nil, utils.NewUserError(utils.USER_INVALID, "Username and email are required")
+		return nil, utils.NewUserError(utils.ErrUserInvalid, "Username and email are required")
 	}
 	exists, err := u.repo.CheckUserEmailExists(email)
 	if err != nil {
 		return nil, err
 	}
 	if exists {
-		return nil, utils.NewUserError(utils.USER_EMAIL_EXISTS, "Email already exists")
+		return nil, utils.NewUserError(utils.ErrUserEmailExists, "Email already exists")
 	}
 
 	hashPassword, err := utils.HashPassword(password)
