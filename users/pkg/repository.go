@@ -8,12 +8,12 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(username, email, password string) (sqlc.FianaceManagerUser, error)
+	CreateUser(username, email, password string) (sqlc.FianaceManagerFMUser, error)
 	CheckUserExists(id int64) (bool, error)
 	CheckUserEmailExists(email string) (bool, error)
-	GetUserById(id int64) (sqlc.FianaceManagerUser, error)
-	GetUserByEmail(email string) (sqlc.FianaceManagerUser, error)
-	GetAllUsers(page, pagesize int32) ([]sqlc.FianaceManagerUser, error)
+	GetUserById(id int64) (sqlc.FianaceManagerFMUser, error)
+	GetUserByEmail(email string) (sqlc.FianaceManagerFMUser, error)
+	GetAllUsers(page, pagesize int32) ([]sqlc.FianaceManagerFMUser, error)
 	UpdateUser(id int64, username, email string, password string) error
 	DeleteUser(id int64) error
 }
@@ -30,14 +30,14 @@ func NewUserRepository(pool *pgxpool.Pool) UserRepository {
 	}
 }
 
-func (u *userRepositoryImpl) CreateUser(username, email, password string) (sqlc.FianaceManagerUser, error) {
+func (u *userRepositoryImpl) CreateUser(username, email, password string) (sqlc.FianaceManagerFMUser, error) {
 	user, err := u.queries.CreateUser(context.Background(), sqlc.CreateUserParams{
 		Username: username,
 		Email:    email,
 		Password: password,
 	})
 	if err != nil {
-		return sqlc.FianaceManagerUser{}, err
+		return sqlc.FianaceManagerFMUser{}, err
 	}
 	return user, nil
 }
@@ -58,23 +58,23 @@ func (u *userRepositoryImpl) CheckUserEmailExists(email string) (bool, error) {
 	return exists, nil
 }
 
-func (u *userRepositoryImpl) GetUserById(id int64) (sqlc.FianaceManagerUser, error) {
+func (u *userRepositoryImpl) GetUserById(id int64) (sqlc.FianaceManagerFMUser, error) {
 	user, err := u.queries.GetUserById(context.Background(), id)
 	if err != nil {
-		return sqlc.FianaceManagerUser{}, err
+		return sqlc.FianaceManagerFMUser{}, err
 	}
 	return user, nil
 }
 
-func (u *userRepositoryImpl) GetUserByEmail(email string) (sqlc.FianaceManagerUser, error) {
+func (u *userRepositoryImpl) GetUserByEmail(email string) (sqlc.FianaceManagerFMUser, error) {
 	user, err := u.queries.GetUserByEmail(context.Background(), email)
 	if err != nil {
-		return sqlc.FianaceManagerUser{}, err
+		return sqlc.FianaceManagerFMUser{}, err
 	}
 	return user, nil
 }
 
-func (u *userRepositoryImpl) GetAllUsers(page, pagesize int32) ([]sqlc.FianaceManagerUser, error) {
+func (u *userRepositoryImpl) GetAllUsers(page, pagesize int32) ([]sqlc.FianaceManagerFMUser, error) {
 	offset := (page - 1) * pagesize
 
 	users, err := u.queries.GetAllUsers(context.Background(), sqlc.GetAllUsersParams{

@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS "Fianace_Manager.Record" (
+CREATE SCHEMA IF NOT EXISTS "finance_manager";
+
+CREATE TABLE IF NOT EXISTS "finance_manager"."FM_Record" (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     amount NUMERIC(9,2) NOT NULL,
@@ -9,6 +11,6 @@ CREATE TABLE IF NOT EXISTS "Fianace_Manager.Record" (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_record_user_id_transaction_date ON "Fianace_Manager.Record" (user_id, transaction_date);
+CREATE INDEX IF NOT EXISTS idx_record_user_id_transaction_date ON "finance_manager"."FM_Record" (user_id, transaction_date);
 
-CREATE INDEX idx_record_user_id_type ON "Fianace_Manager.Record" (user_id, record_type);
+CREATE INDEX idx_record_user_id_type ON "finance_manager"."FM_Record" (user_id, record_type);

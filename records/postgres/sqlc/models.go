@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type FianaceManagerRecord struct {
+type FinanceManagerFMRecord struct {
 	ID              int64              `json:"id"`
 	UserID          int64              `json:"user_id"`
 	Amount          float32            `json:"amount"`

@@ -10,7 +10,7 @@ func NewRecordService(repo RecordRepository) *RecordService {
 	return &RecordService{repo: repo}
 }
 
-func (r *RecordService) CreateRecord(userId int64, amount float32, transactionDate int64, recordType string, detail string) (*sqlc.FianaceManagerRecord, error) {
+func (r *RecordService) CreateRecord(userId int64, amount float32, transactionDate int64, recordType string, detail string) (*sqlc.FinanceManagerFMRecord, error) {
 	record, err := r.repo.CreateRecord(userId, amount, transactionDate, recordType, detail)
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func (r *RecordService) CreateRecord(userId int64, amount float32, transactionDa
 	return &record, nil
 }
 
-func (r *RecordService) GetRecord(id int64) (*sqlc.FianaceManagerRecord, error) {
+func (r *RecordService) GetRecord(id int64) (*sqlc.FinanceManagerFMRecord, error) {
 	record, err := r.repo.GetRecord(id)
 	if err != nil {
 		return nil, err
@@ -26,9 +26,9 @@ func (r *RecordService) GetRecord(id int64) (*sqlc.FianaceManagerRecord, error) 
 	return record, nil
 }
 
-func (r *RecordService) GetUserRecordsWithFilters(userId int64, recordType string, startTime int64, endTime int64) (*[]sqlc.FianaceManagerRecord, error) {
+func (r *RecordService) GetUserRecordsWithFilters(userId int64, recordType string, startTime int64, endTime int64) (*[]sqlc.FinanceManagerFMRecord, error) {
 
-	var records []sqlc.FianaceManagerRecord
+	var records []sqlc.FinanceManagerFMRecord
 	var err error
 
 	switch {

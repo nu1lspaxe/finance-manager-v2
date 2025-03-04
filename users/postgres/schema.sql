@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS "Fianace_Manager.User" (
+CREATE SCHEMA IF NOT EXISTS "fianace_manager";
+
+CREATE TABLE IF NOT EXISTS "fianace_manager"."FM_User" (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(20) NOT NULL,
     email VARCHAR(256) NOT NULL UNIQUE,

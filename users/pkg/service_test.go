@@ -18,7 +18,7 @@ func TestCreateUser(t *testing.T) {
 			On("CheckUserEmailExists", "test@example.com").
 			Return(false, nil).
 			On("CreateUser", "testuser", "test@example.com", mock.Anything).
-			Return(sqlc.FianaceManagerUser{
+			Return(sqlc.FianaceManagerFMUser{
 				ID:       1,
 				Username: "testuser",
 				Email:    "test@example.com",
@@ -53,7 +53,7 @@ func TestCreateUser(t *testing.T) {
 			On("CheckUserEmailExists", "test@example.com").
 			Return(false, nil).
 			On("CreateUser", "testuser", "test@example.com", mock.Anything).
-			Return(sqlc.FianaceManagerUser{}, errors.New("repository error"))
+			Return(sqlc.FianaceManagerFMUser{}, errors.New("repository error"))
 
 		service := NewUserService(mockRepo)
 
@@ -70,7 +70,7 @@ func TestGetUser(t *testing.T) {
 
 		mockRepo.
 			On("GetUser", int64(1)).
-			Return(sqlc.FianaceManagerUser{
+			Return(sqlc.FianaceManagerFMUser{
 				ID:       1,
 				Username: "testuser",
 				Email:    "test@example.com",
@@ -89,7 +89,7 @@ func TestGetUser(t *testing.T) {
 
 		mockRepo.
 			On("GetUser", int64(1)).
-			Return(sqlc.FianaceManagerUser{}, errors.New("repository error"))
+			Return(sqlc.FianaceManagerFMUser{}, errors.New("repository error"))
 
 		service := NewUserService(mockRepo)
 
@@ -106,7 +106,7 @@ func TestListUsers(t *testing.T) {
 
 		mockRepo.
 			On("ListUsers").
-			Return([]sqlc.FianaceManagerUser{
+			Return([]sqlc.FianaceManagerFMUser{
 				{
 					ID:       1,
 					Username: "testuser",
@@ -127,7 +127,7 @@ func TestListUsers(t *testing.T) {
 
 		mockRepo.
 			On("ListUsers").
-			Return([]sqlc.FianaceManagerUser{}, errors.New("repository error"))
+			Return([]sqlc.FianaceManagerFMUser{}, errors.New("repository error"))
 
 		service := NewUserService(mockRepo)
 

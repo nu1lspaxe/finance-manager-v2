@@ -6,7 +6,7 @@ import (
 	"users/postgres/sqlc"
 )
 
-func SqlcToProto(user sqlc.FianaceManagerUser) *proto.User {
+func SqlcToProto(user sqlc.FianaceManagerFMUser) *proto.User {
 	return &proto.User{
 		Id:        user.ID,
 		Username:  user.Username,

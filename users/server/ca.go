@@ -13,22 +13,34 @@ import (
 	"net"
 	"os"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
+var certFile, keyFile string
+
 func init() {
-	err := setupCertificate()
-	if err != nil {
-		panic(err)
-	}
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.ReadInConfig()
+
+	// err := setupCertificate()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	certFile = viper.GetString("certs.path.cert")
+	keyFile = viper.GetString("certs.path.key")
 }
 
 func LoadTLSConfig() (*tls.Config, error) {
-	cert, err := tls.LoadX509KeyPair("certs/cert.pem", "certs/key.pem")
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
 		return nil, err
 	}
 
-	caCert, err := os.ReadFile("certs/cert.pem")
+	caCert, err := os.ReadFile(certFile)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +96,7 @@ func setupCertificate() error {
 		return fmt.Errorf("failed to create certificate: %v", err)
 	}
 
-	certOut, err := os.OpenFile("certs/cert.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	certOut, err := os.OpenFile(certFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return fmt.Errorf("failed to open cert file: %v", err)
 	}
@@ -94,7 +106,7 @@ func setupCertificate() error {
 	}
 	certOut.Close()
 
-	keyOut, err := os.OpenFile("certs/key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile(keyFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return fmt.Errorf("failed to open key file: %v", err)
 	}

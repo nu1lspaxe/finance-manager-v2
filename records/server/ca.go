@@ -13,13 +13,25 @@ import (
 	"net"
 	"os"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
+var certFile, keyFile string
+
 func init() {
-	err := setupCertificate()
-	if err != nil {
-		panic(err)
-	}
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.ReadInConfig()
+
+	// err := setupCertificate()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	certFile = viper.GetString("certs.path.cert")
+	keyFile = viper.GetString("certs.path.key")
 }
 
 func LoadTLSConfig() (*tls.Config, error) {

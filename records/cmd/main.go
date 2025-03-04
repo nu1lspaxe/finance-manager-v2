@@ -4,16 +4,7 @@ import (
 	"fmt"
 	"os"
 	"records/server"
-
-	"github.com/spf13/viper"
 )
-
-func init() {
-	viper.AddConfigPath("./configs")
-	viper.SetConfigName("config")
-	viper.SetConfigType("json")
-	viper.ReadInConfig()
-}
 
 func main() {
 	app, err := server.NewServer()

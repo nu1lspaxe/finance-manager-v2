@@ -17,7 +17,7 @@ func TestCreateRecord(t *testing.T) {
 
 		mockRepo.
 			On("CreateRecord", int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
-			Return(sqlc.FianaceManagerRecord{
+			Return(sqlc.FinanceManagerFMRecord{
 				ID:              1,
 				UserID:          1,
 				Amount:          100.0,
@@ -38,7 +38,7 @@ func TestCreateRecord(t *testing.T) {
 
 		mockRepo.
 			On("CreateRecord", int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
-			Return(sqlc.FianaceManagerRecord{}, errors.New("repository error"))
+			Return(sqlc.FinanceManagerFMRecord{}, errors.New("repository error"))
 
 		service := NewRecordService(mockRepo)
 
@@ -54,7 +54,7 @@ func TestGetRecord(t *testing.T) {
 
 		mockRepo.
 			On("GetRecord", int64(1)).
-			Return(&sqlc.FianaceManagerRecord{
+			Return(&sqlc.FinanceManagerFMRecord{
 				ID:              1,
 				UserID:          1,
 				Amount:          100.0,
@@ -75,7 +75,7 @@ func TestGetRecord(t *testing.T) {
 
 		mockRepo.
 			On("GetRecord", int64(1)).
-			Return(&sqlc.FianaceManagerRecord{}, errors.New("repository error"))
+			Return(&sqlc.FinanceManagerFMRecord{}, errors.New("repository error"))
 
 		service := NewRecordService(mockRepo)
 
@@ -91,7 +91,7 @@ func TestGetUserRecordsWithFilters(t *testing.T) {
 
 		mockRepo.
 			On("GetUserRecords", int64(1)).
-			Return([]sqlc.FianaceManagerRecord{
+			Return([]sqlc.FinanceManagerFMRecord{
 				{
 					ID:              1,
 					UserID:          1,
@@ -114,7 +114,7 @@ func TestGetUserRecordsWithFilters(t *testing.T) {
 
 		mockRepo.
 			On("GetUserRecords", int64(1)).
-			Return([]sqlc.FianaceManagerRecord{}, errors.New("repository error"))
+			Return([]sqlc.FinanceManagerFMRecord{}, errors.New("repository error"))
 
 		service := NewRecordService(mockRepo)
 
