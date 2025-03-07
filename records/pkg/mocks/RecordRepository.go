@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	context "context"
+
 	mock "github.com/stretchr/testify/mock"
 
 	sqlc "records/postgres/sqlc"
@@ -13,27 +15,27 @@ type RecordRepository struct {
 	mock.Mock
 }
 
-// CreateRecord provides a mock function with given fields: userId, amount, transactionDate, recordType, detail
-func (_m *RecordRepository) CreateRecord(userId int64, amount float32, transactionDate int64, recordType string, detail string) (sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId, amount, transactionDate, recordType, detail)
+// CreateRecord provides a mock function with given fields: ctx, userId, amount, transactionDate, recordType, detail
+func (_m *RecordRepository) CreateRecord(ctx context.Context, userId int64, amount float32, transactionDate int64, recordType string, detail string) (sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId, amount, transactionDate, recordType, detail)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateRecord")
 	}
 
-	var r0 sqlc.FinanceManagerFMRecord
+	var r0 sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64, float32, int64, string, string) (sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId, amount, transactionDate, recordType, detail)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, float32, int64, string, string) (sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId, amount, transactionDate, recordType, detail)
 	}
-	if rf, ok := ret.Get(0).(func(int64, float32, int64, string, string) sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId, amount, transactionDate, recordType, detail)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, float32, int64, string, string) sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId, amount, transactionDate, recordType, detail)
 	} else {
-		r0 = ret.Get(0).(sqlc.FinanceManagerFMRecord)
+		r0 = ret.Get(0).(sqlc.FMRecord)
 	}
 
-	if rf, ok := ret.Get(1).(func(int64, float32, int64, string, string) error); ok {
-		r1 = rf(userId, amount, transactionDate, recordType, detail)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, float32, int64, string, string) error); ok {
+		r1 = rf(ctx, userId, amount, transactionDate, recordType, detail)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -41,17 +43,17 @@ func (_m *RecordRepository) CreateRecord(userId int64, amount float32, transacti
 	return r0, r1
 }
 
-// DeleteRecord provides a mock function with given fields: id
-func (_m *RecordRepository) DeleteRecord(id int64) error {
-	ret := _m.Called(id)
+// DeleteRecord provides a mock function with given fields: ctx, id
+func (_m *RecordRepository) DeleteRecord(ctx context.Context, id int64) error {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteRecord")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(int64) error); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -59,29 +61,29 @@ func (_m *RecordRepository) DeleteRecord(id int64) error {
 	return r0
 }
 
-// GetRecord provides a mock function with given fields: id
-func (_m *RecordRepository) GetRecord(id int64) (*sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(id)
+// GetRecord provides a mock function with given fields: ctx, id
+func (_m *RecordRepository) GetRecord(ctx context.Context, id int64) (*sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetRecord")
 	}
 
-	var r0 *sqlc.FinanceManagerFMRecord
+	var r0 *sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64) (*sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) (*sqlc.FMRecord, error)); ok {
+		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(int64) *sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *sqlc.FMRecord); ok {
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).(*sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64) error); ok {
-		r1 = rf(id)
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -89,29 +91,29 @@ func (_m *RecordRepository) GetRecord(id int64) (*sqlc.FinanceManagerFMRecord, e
 	return r0, r1
 }
 
-// GetUserRecords provides a mock function with given fields: userId
-func (_m *RecordRepository) GetUserRecords(userId int64) ([]sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId)
+// GetUserRecords provides a mock function with given fields: ctx, userId
+func (_m *RecordRepository) GetUserRecords(ctx context.Context, userId int64) ([]sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRecords")
 	}
 
-	var r0 []sqlc.FinanceManagerFMRecord
+	var r0 []sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64) ([]sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) ([]sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId)
 	}
-	if rf, ok := ret.Get(0).(func(int64) []sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) []sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).([]sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64) error); ok {
-		r1 = rf(userId)
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, userId)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -119,29 +121,29 @@ func (_m *RecordRepository) GetUserRecords(userId int64) ([]sqlc.FinanceManagerF
 	return r0, r1
 }
 
-// GetUserRecordsByType provides a mock function with given fields: userId, recordType
-func (_m *RecordRepository) GetUserRecordsByType(userId int64, recordType string) ([]sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId, recordType)
+// GetUserRecordsByType provides a mock function with given fields: ctx, userId, recordType
+func (_m *RecordRepository) GetUserRecordsByType(ctx context.Context, userId int64, recordType string) ([]sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId, recordType)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRecordsByType")
 	}
 
-	var r0 []sqlc.FinanceManagerFMRecord
+	var r0 []sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64, string) ([]sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId, recordType)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string) ([]sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId, recordType)
 	}
-	if rf, ok := ret.Get(0).(func(int64, string) []sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId, recordType)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string) []sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId, recordType)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).([]sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64, string) error); ok {
-		r1 = rf(userId, recordType)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, string) error); ok {
+		r1 = rf(ctx, userId, recordType)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -149,29 +151,29 @@ func (_m *RecordRepository) GetUserRecordsByType(userId int64, recordType string
 	return r0, r1
 }
 
-// GetUserRecordsByTypeFromDate provides a mock function with given fields: userId, recordType, date
-func (_m *RecordRepository) GetUserRecordsByTypeFromDate(userId int64, recordType string, date int64) ([]sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId, recordType, date)
+// GetUserRecordsByTypeFromDate provides a mock function with given fields: ctx, userId, recordType, date
+func (_m *RecordRepository) GetUserRecordsByTypeFromDate(ctx context.Context, userId int64, recordType string, date int64) ([]sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId, recordType, date)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRecordsByTypeFromDate")
 	}
 
-	var r0 []sqlc.FinanceManagerFMRecord
+	var r0 []sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64, string, int64) ([]sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId, recordType, date)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string, int64) ([]sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId, recordType, date)
 	}
-	if rf, ok := ret.Get(0).(func(int64, string, int64) []sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId, recordType, date)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string, int64) []sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId, recordType, date)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).([]sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64, string, int64) error); ok {
-		r1 = rf(userId, recordType, date)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, string, int64) error); ok {
+		r1 = rf(ctx, userId, recordType, date)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -179,29 +181,29 @@ func (_m *RecordRepository) GetUserRecordsByTypeFromDate(userId int64, recordTyp
 	return r0, r1
 }
 
-// GetUserRecordsByTypeToDate provides a mock function with given fields: userId, recordType, date
-func (_m *RecordRepository) GetUserRecordsByTypeToDate(userId int64, recordType string, date int64) ([]sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId, recordType, date)
+// GetUserRecordsByTypeToDate provides a mock function with given fields: ctx, userId, recordType, date
+func (_m *RecordRepository) GetUserRecordsByTypeToDate(ctx context.Context, userId int64, recordType string, date int64) ([]sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId, recordType, date)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRecordsByTypeToDate")
 	}
 
-	var r0 []sqlc.FinanceManagerFMRecord
+	var r0 []sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64, string, int64) ([]sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId, recordType, date)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string, int64) ([]sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId, recordType, date)
 	}
-	if rf, ok := ret.Get(0).(func(int64, string, int64) []sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId, recordType, date)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string, int64) []sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId, recordType, date)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).([]sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64, string, int64) error); ok {
-		r1 = rf(userId, recordType, date)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, string, int64) error); ok {
+		r1 = rf(ctx, userId, recordType, date)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -209,29 +211,29 @@ func (_m *RecordRepository) GetUserRecordsByTypeToDate(userId int64, recordType 
 	return r0, r1
 }
 
-// GetUserRecordsByTypeWithPeriod provides a mock function with given fields: userId, recordType, startTime, endTime
-func (_m *RecordRepository) GetUserRecordsByTypeWithPeriod(userId int64, recordType string, startTime int64, endTime int64) ([]sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId, recordType, startTime, endTime)
+// GetUserRecordsByTypeWithPeriod provides a mock function with given fields: ctx, userId, recordType, startTime, endTime
+func (_m *RecordRepository) GetUserRecordsByTypeWithPeriod(ctx context.Context, userId int64, recordType string, startTime int64, endTime int64) ([]sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId, recordType, startTime, endTime)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRecordsByTypeWithPeriod")
 	}
 
-	var r0 []sqlc.FinanceManagerFMRecord
+	var r0 []sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64, string, int64, int64) ([]sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId, recordType, startTime, endTime)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string, int64, int64) ([]sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId, recordType, startTime, endTime)
 	}
-	if rf, ok := ret.Get(0).(func(int64, string, int64, int64) []sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId, recordType, startTime, endTime)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string, int64, int64) []sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId, recordType, startTime, endTime)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).([]sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64, string, int64, int64) error); ok {
-		r1 = rf(userId, recordType, startTime, endTime)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, string, int64, int64) error); ok {
+		r1 = rf(ctx, userId, recordType, startTime, endTime)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -239,29 +241,29 @@ func (_m *RecordRepository) GetUserRecordsByTypeWithPeriod(userId int64, recordT
 	return r0, r1
 }
 
-// GetUserRecordsFromDate provides a mock function with given fields: userId, date
-func (_m *RecordRepository) GetUserRecordsFromDate(userId int64, date int64) ([]sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId, date)
+// GetUserRecordsFromDate provides a mock function with given fields: ctx, userId, date
+func (_m *RecordRepository) GetUserRecordsFromDate(ctx context.Context, userId int64, date int64) ([]sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId, date)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRecordsFromDate")
 	}
 
-	var r0 []sqlc.FinanceManagerFMRecord
+	var r0 []sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64, int64) ([]sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId, date)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) ([]sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId, date)
 	}
-	if rf, ok := ret.Get(0).(func(int64, int64) []sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId, date)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) []sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId, date)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).([]sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64, int64) error); ok {
-		r1 = rf(userId, date)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, int64) error); ok {
+		r1 = rf(ctx, userId, date)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -269,29 +271,29 @@ func (_m *RecordRepository) GetUserRecordsFromDate(userId int64, date int64) ([]
 	return r0, r1
 }
 
-// GetUserRecordsToDate provides a mock function with given fields: userId, date
-func (_m *RecordRepository) GetUserRecordsToDate(userId int64, date int64) ([]sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId, date)
+// GetUserRecordsToDate provides a mock function with given fields: ctx, userId, date
+func (_m *RecordRepository) GetUserRecordsToDate(ctx context.Context, userId int64, date int64) ([]sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId, date)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRecordsToDate")
 	}
 
-	var r0 []sqlc.FinanceManagerFMRecord
+	var r0 []sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64, int64) ([]sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId, date)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) ([]sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId, date)
 	}
-	if rf, ok := ret.Get(0).(func(int64, int64) []sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId, date)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) []sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId, date)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).([]sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64, int64) error); ok {
-		r1 = rf(userId, date)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, int64) error); ok {
+		r1 = rf(ctx, userId, date)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -299,29 +301,29 @@ func (_m *RecordRepository) GetUserRecordsToDate(userId int64, date int64) ([]sq
 	return r0, r1
 }
 
-// GetUserRecordsWithPeriod provides a mock function with given fields: userId, startTime, endTime
-func (_m *RecordRepository) GetUserRecordsWithPeriod(userId int64, startTime int64, endTime int64) ([]sqlc.FinanceManagerFMRecord, error) {
-	ret := _m.Called(userId, startTime, endTime)
+// GetUserRecordsWithPeriod provides a mock function with given fields: ctx, userId, startTime, endTime
+func (_m *RecordRepository) GetUserRecordsWithPeriod(ctx context.Context, userId int64, startTime int64, endTime int64) ([]sqlc.FMRecord, error) {
+	ret := _m.Called(ctx, userId, startTime, endTime)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRecordsWithPeriod")
 	}
 
-	var r0 []sqlc.FinanceManagerFMRecord
+	var r0 []sqlc.FMRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64, int64, int64) ([]sqlc.FinanceManagerFMRecord, error)); ok {
-		return rf(userId, startTime, endTime)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int64, int64) ([]sqlc.FMRecord, error)); ok {
+		return rf(ctx, userId, startTime, endTime)
 	}
-	if rf, ok := ret.Get(0).(func(int64, int64, int64) []sqlc.FinanceManagerFMRecord); ok {
-		r0 = rf(userId, startTime, endTime)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int64, int64) []sqlc.FMRecord); ok {
+		r0 = rf(ctx, userId, startTime, endTime)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FinanceManagerFMRecord)
+			r0 = ret.Get(0).([]sqlc.FMRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64, int64, int64) error); ok {
-		r1 = rf(userId, startTime, endTime)
+	if rf, ok := ret.Get(1).(func(context.Context, int64, int64, int64) error); ok {
+		r1 = rf(ctx, userId, startTime, endTime)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -329,17 +331,17 @@ func (_m *RecordRepository) GetUserRecordsWithPeriod(userId int64, startTime int
 	return r0, r1
 }
 
-// UpdateRecord provides a mock function with given fields: id, amount, transactionDate, recordType, detail
-func (_m *RecordRepository) UpdateRecord(id int64, amount float32, transactionDate int64, recordType string, detail string) error {
-	ret := _m.Called(id, amount, transactionDate, recordType, detail)
+// UpdateRecord provides a mock function with given fields: ctx, id, amount, transactionDate, recordType, detail
+func (_m *RecordRepository) UpdateRecord(ctx context.Context, id int64, amount float32, transactionDate int64, recordType string, detail string) error {
+	ret := _m.Called(ctx, id, amount, transactionDate, recordType, detail)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateRecord")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(int64, float32, int64, string, string) error); ok {
-		r0 = rf(id, amount, transactionDate, recordType, detail)
+	if rf, ok := ret.Get(0).(func(context.Context, int64, float32, int64, string, string) error); ok {
+		r0 = rf(ctx, id, amount, transactionDate, recordType, detail)
 	} else {
 		r0 = ret.Error(0)
 	}

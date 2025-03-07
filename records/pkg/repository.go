@@ -9,18 +9,18 @@ import (
 )
 
 type RecordRepository interface {
-	CreateRecord(userId int64, amount float32, transactionDate int64, recordType string, detail string) (sqlc.FinanceManagerFMRecord, error)
-	GetRecord(id int64) (*sqlc.FinanceManagerFMRecord, error)
-	GetUserRecords(userId int64) ([]sqlc.FinanceManagerFMRecord, error)
-	GetUserRecordsWithPeriod(userId int64, startTime int64, endTime int64) ([]sqlc.FinanceManagerFMRecord, error)
-	GetUserRecordsFromDate(userId int64, date int64) ([]sqlc.FinanceManagerFMRecord, error)
-	GetUserRecordsToDate(userId int64, date int64) ([]sqlc.FinanceManagerFMRecord, error)
-	GetUserRecordsByType(userId int64, recordType string) ([]sqlc.FinanceManagerFMRecord, error)
-	GetUserRecordsByTypeWithPeriod(userId int64, recordType string, startTime int64, endTime int64) ([]sqlc.FinanceManagerFMRecord, error)
-	GetUserRecordsByTypeFromDate(userId int64, recordType string, date int64) ([]sqlc.FinanceManagerFMRecord, error)
-	GetUserRecordsByTypeToDate(userId int64, recordType string, date int64) ([]sqlc.FinanceManagerFMRecord, error)
-	UpdateRecord(id int64, amount float32, transactionDate int64, recordType string, detail string) error
-	DeleteRecord(id int64) error
+	CreateRecord(ctx context.Context, userId int64, amount float32, transactionDate int64, recordType string, detail string) (sqlc.FMRecord, error)
+	GetRecord(ctx context.Context, id int64) (*sqlc.FMRecord, error)
+	GetUserRecords(ctx context.Context, userId int64) ([]sqlc.FMRecord, error)
+	GetUserRecordsWithPeriod(ctx context.Context, userId int64, startTime int64, endTime int64) ([]sqlc.FMRecord, error)
+	GetUserRecordsFromDate(ctx context.Context, userId int64, date int64) ([]sqlc.FMRecord, error)
+	GetUserRecordsToDate(ctx context.Context, userId int64, date int64) ([]sqlc.FMRecord, error)
+	GetUserRecordsByType(ctx context.Context, userId int64, recordType string) ([]sqlc.FMRecord, error)
+	GetUserRecordsByTypeWithPeriod(ctx context.Context, userId int64, recordType string, startTime int64, endTime int64) ([]sqlc.FMRecord, error)
+	GetUserRecordsByTypeFromDate(ctx context.Context, userId int64, recordType string, date int64) ([]sqlc.FMRecord, error)
+	GetUserRecordsByTypeToDate(ctx context.Context, userId int64, recordType string, date int64) ([]sqlc.FMRecord, error)
+	UpdateRecord(ctx context.Context, id int64, amount float32, transactionDate int64, recordType string, detail string) error
+	DeleteRecord(ctx context.Context, id int64) error
 }
 
 type recordRepositoryImpl struct {
@@ -35,11 +35,11 @@ func NewRecordRepository(pool *pgxpool.Pool) RecordRepository {
 	}
 }
 
-func (r recordRepositoryImpl) CreateRecord(userId int64, amount float32, transactionDate int64, recordType string, detail string) (sqlc.FinanceManagerFMRecord, error) {
+func (r recordRepositoryImpl) CreateRecord(ctx context.Context, userId int64, amount float32, transactionDate int64, recordType string, detail string) (sqlc.FMRecord, error) {
 
 	txDate := utils.Int64ToPgDate(transactionDate)
 
-	record, err := r.queries.CreateRecord(context.Background(), sqlc.CreateRecordParams{
+	record, err := r.queries.CreateRecord(ctx, sqlc.CreateRecordParams{
 		UserID:          userId,
 		Amount:          amount,
 		TransactionDate: txDate,
@@ -47,32 +47,32 @@ func (r recordRepositoryImpl) CreateRecord(userId int64, amount float32, transac
 		Detail:          detail,
 	})
 	if err != nil {
-		return sqlc.FinanceManagerFMRecord{}, err
+		return sqlc.FMRecord{}, err
 	}
 	return record, nil
 }
 
-func (r recordRepositoryImpl) GetRecord(id int64) (*sqlc.FinanceManagerFMRecord, error) {
-	record, err := r.queries.GetRecord(context.Background(), id)
+func (r recordRepositoryImpl) GetRecord(ctx context.Context, id int64) (*sqlc.FMRecord, error) {
+	record, err := r.queries.GetRecord(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	return &record, nil
 }
 
-func (r recordRepositoryImpl) GetUserRecords(userId int64) ([]sqlc.FinanceManagerFMRecord, error) {
-	records, err := r.queries.GetUserRecords(context.Background(), userId)
+func (r recordRepositoryImpl) GetUserRecords(ctx context.Context, userId int64) ([]sqlc.FMRecord, error) {
+	records, err := r.queries.GetUserRecords(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 	return records, nil
 }
 
-func (r recordRepositoryImpl) GetUserRecordsWithPeriod(userId int64, startTime int64, endTime int64) ([]sqlc.FinanceManagerFMRecord, error) {
+func (r recordRepositoryImpl) GetUserRecordsWithPeriod(ctx context.Context, userId int64, startTime int64, endTime int64) ([]sqlc.FMRecord, error) {
 	sDate := utils.Int64ToPgDate(startTime)
 	eDate := utils.Int64ToPgDate(endTime)
 
-	records, err := r.queries.GetUserRecordsWithPeriod(context.Background(), sqlc.GetUserRecordsWithPeriodParams{
+	records, err := r.queries.GetUserRecordsWithPeriod(ctx, sqlc.GetUserRecordsWithPeriodParams{
 		UserID:            userId,
 		TransactionDate:   sDate,
 		TransactionDate_2: eDate,
@@ -83,10 +83,10 @@ func (r recordRepositoryImpl) GetUserRecordsWithPeriod(userId int64, startTime i
 	return records, nil
 }
 
-func (r recordRepositoryImpl) GetUserRecordsFromDate(userId int64, date int64) ([]sqlc.FinanceManagerFMRecord, error) {
+func (r recordRepositoryImpl) GetUserRecordsFromDate(ctx context.Context, userId int64, date int64) ([]sqlc.FMRecord, error) {
 	txDate := utils.Int64ToPgDate(date)
 
-	records, err := r.queries.GetUserRecordsFromDate(context.Background(), sqlc.GetUserRecordsFromDateParams{
+	records, err := r.queries.GetUserRecordsFromDate(ctx, sqlc.GetUserRecordsFromDateParams{
 		UserID:          userId,
 		TransactionDate: txDate,
 	})
@@ -96,10 +96,10 @@ func (r recordRepositoryImpl) GetUserRecordsFromDate(userId int64, date int64) (
 	return records, nil
 }
 
-func (r recordRepositoryImpl) GetUserRecordsToDate(userId int64, date int64) ([]sqlc.FinanceManagerFMRecord, error) {
+func (r recordRepositoryImpl) GetUserRecordsToDate(ctx context.Context, userId int64, date int64) ([]sqlc.FMRecord, error) {
 	txDate := utils.Int64ToPgDate(date)
 
-	records, err := r.queries.GetUserRecordsToDate(context.Background(), sqlc.GetUserRecordsToDateParams{
+	records, err := r.queries.GetUserRecordsToDate(ctx, sqlc.GetUserRecordsToDateParams{
 		UserID:          userId,
 		TransactionDate: txDate,
 	})
@@ -109,8 +109,8 @@ func (r recordRepositoryImpl) GetUserRecordsToDate(userId int64, date int64) ([]
 	return records, nil
 }
 
-func (r recordRepositoryImpl) GetUserRecordsByType(userId int64, recordType string) ([]sqlc.FinanceManagerFMRecord, error) {
-	records, err := r.queries.GetUserRecordsByType(context.Background(), sqlc.GetUserRecordsByTypeParams{
+func (r recordRepositoryImpl) GetUserRecordsByType(ctx context.Context, userId int64, recordType string) ([]sqlc.FMRecord, error) {
+	records, err := r.queries.GetUserRecordsByType(ctx, sqlc.GetUserRecordsByTypeParams{
 		UserID:     userId,
 		RecordType: recordType,
 	})
@@ -120,11 +120,11 @@ func (r recordRepositoryImpl) GetUserRecordsByType(userId int64, recordType stri
 	return records, nil
 }
 
-func (r recordRepositoryImpl) GetUserRecordsByTypeWithPeriod(userId int64, recordType string, startTime int64, endTime int64) ([]sqlc.FinanceManagerFMRecord, error) {
+func (r recordRepositoryImpl) GetUserRecordsByTypeWithPeriod(ctx context.Context, userId int64, recordType string, startTime int64, endTime int64) ([]sqlc.FMRecord, error) {
 	sDate := utils.Int64ToPgDate(startTime)
 	eDate := utils.Int64ToPgDate(endTime)
 
-	records, err := r.queries.GetUserRecordsByTypeWithPeriod(context.Background(), sqlc.GetUserRecordsByTypeWithPeriodParams{
+	records, err := r.queries.GetUserRecordsByTypeWithPeriod(ctx, sqlc.GetUserRecordsByTypeWithPeriodParams{
 		UserID:            userId,
 		RecordType:        recordType,
 		TransactionDate:   sDate,
@@ -136,10 +136,10 @@ func (r recordRepositoryImpl) GetUserRecordsByTypeWithPeriod(userId int64, recor
 	return records, nil
 }
 
-func (r recordRepositoryImpl) GetUserRecordsByTypeFromDate(userId int64, recordType string, date int64) ([]sqlc.FinanceManagerFMRecord, error) {
+func (r recordRepositoryImpl) GetUserRecordsByTypeFromDate(ctx context.Context, userId int64, recordType string, date int64) ([]sqlc.FMRecord, error) {
 	txDate := utils.Int64ToPgDate(date)
 
-	records, err := r.queries.GetUserRecordsByTypeFromDate(context.Background(), sqlc.GetUserRecordsByTypeFromDateParams{
+	records, err := r.queries.GetUserRecordsByTypeFromDate(ctx, sqlc.GetUserRecordsByTypeFromDateParams{
 		UserID:          userId,
 		RecordType:      recordType,
 		TransactionDate: txDate,
@@ -150,10 +150,10 @@ func (r recordRepositoryImpl) GetUserRecordsByTypeFromDate(userId int64, recordT
 	return records, nil
 }
 
-func (r recordRepositoryImpl) GetUserRecordsByTypeToDate(userId int64, recordType string, date int64) ([]sqlc.FinanceManagerFMRecord, error) {
+func (r recordRepositoryImpl) GetUserRecordsByTypeToDate(ctx context.Context, userId int64, recordType string, date int64) ([]sqlc.FMRecord, error) {
 	txDate := utils.Int64ToPgDate(date)
 
-	records, err := r.queries.GetUserRecordsByTypeToDate(context.Background(), sqlc.GetUserRecordsByTypeToDateParams{
+	records, err := r.queries.GetUserRecordsByTypeToDate(ctx, sqlc.GetUserRecordsByTypeToDateParams{
 		UserID:          userId,
 		RecordType:      recordType,
 		TransactionDate: txDate,
@@ -164,10 +164,10 @@ func (r recordRepositoryImpl) GetUserRecordsByTypeToDate(userId int64, recordTyp
 	return records, nil
 }
 
-func (r recordRepositoryImpl) UpdateRecord(id int64, amount float32, transactionDate int64, recordType string, detail string) error {
+func (r recordRepositoryImpl) UpdateRecord(ctx context.Context, id int64, amount float32, transactionDate int64, recordType string, detail string) error {
 	txDate := utils.Int64ToPgDate(transactionDate)
 
-	err := r.queries.UpdateRecord(context.Background(), sqlc.UpdateRecordParams{
+	err := r.queries.UpdateRecord(ctx, sqlc.UpdateRecordParams{
 		ID:              id,
 		Amount:          amount,
 		TransactionDate: txDate,
@@ -180,8 +180,8 @@ func (r recordRepositoryImpl) UpdateRecord(id int64, amount float32, transaction
 	return nil
 }
 
-func (r recordRepositoryImpl) DeleteRecord(id int64) error {
-	err := r.queries.DeleteRecord(context.Background(), id)
+func (r recordRepositoryImpl) DeleteRecord(ctx context.Context, id int64) error {
+	err := r.queries.DeleteRecord(ctx, id)
 	if err != nil {
 		return err
 	}

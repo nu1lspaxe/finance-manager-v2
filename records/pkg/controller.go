@@ -23,7 +23,10 @@ func (r *RecordController) CreateRecord(ctx context.Context, req *proto.CreateRe
 		return nil, err
 	}
 
-	record, err := r.service.CreateRecord(req.UserId, req.Amount, req.TransactionDate, req.RecordType.String(), req.Detail)
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	record, err := r.service.CreateRecord(ctx, req.UserId, req.Amount, req.TransactionDate, req.RecordType.String(), req.Detail)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +38,10 @@ func (r *RecordController) CreateRecord(ctx context.Context, req *proto.CreateRe
 }
 
 func (r *RecordController) GetRecord(ctx context.Context, req *proto.GetRecordRequest) (*proto.RecordResponse, error) {
-	record, err := r.service.GetRecord(req.Id)
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	record, err := r.service.GetRecord(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +58,10 @@ func (r *RecordController) GetUserRecordsWithFilters(req *proto.GetUserRecordsWi
 		return err
 	}
 
-	records, err := r.service.GetUserRecordsWithFilters(req.UserId, req.RecordType.String(), req.StartTime, req.EndTime)
+	ctx, cancel := context.WithTimeout(stream.Context(), utils.TIMEOUT_STREAM)
+	defer cancel()
+
+	records, err := r.service.GetUserRecordsWithFilters(ctx, req.UserId, req.RecordType.String(), req.StartTime, req.EndTime)
 	if err != nil {
 		return err
 	}
@@ -74,7 +83,10 @@ func (r *RecordController) UpdateRecord(ctx context.Context, req *proto.UpdateRe
 		return nil, err
 	}
 
-	err = r.service.UpdateRecord(req.Id, req.Amount, req.TransactionDate, req.RecordType.String(), req.Detail)
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	err = r.service.UpdateRecord(ctx, req.Id, req.Amount, req.TransactionDate, req.RecordType.String(), req.Detail)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +94,10 @@ func (r *RecordController) UpdateRecord(ctx context.Context, req *proto.UpdateRe
 }
 
 func (r *RecordController) DeleteRecord(ctx context.Context, req *proto.DeleteRecordRequest) (*proto.DeleteRecordResponse, error) {
-	err := r.service.DeleteRecord(req.Id)
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	err := r.service.DeleteRecord(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
