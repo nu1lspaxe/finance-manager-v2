@@ -1,8 +1,8 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "postgres/query.sql"
-    schema: "postgres/schema.sql"
+    queries: "postgres/fm_user_query.sql"
+    schema: "postgres/fm_user.sql"
     gen:
       go:
         package: "sqlc"

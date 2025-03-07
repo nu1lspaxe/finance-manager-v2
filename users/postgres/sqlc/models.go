@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type FianaceManagerFMUser struct {
+type FMUser struct {
 	ID        int64              `json:"id"`
 	Username  string             `json:"username"`
 	Email     string             `json:"email"`

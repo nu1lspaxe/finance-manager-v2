@@ -8,14 +8,14 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(username, email, password string) (sqlc.FianaceManagerFMUser, error)
-	CheckUserExists(id int64) (bool, error)
-	CheckUserEmailExists(email string) (bool, error)
-	GetUserById(id int64) (sqlc.FianaceManagerFMUser, error)
-	GetUserByEmail(email string) (sqlc.FianaceManagerFMUser, error)
-	GetAllUsers(page, pagesize int32) ([]sqlc.FianaceManagerFMUser, error)
-	UpdateUser(id int64, username, email string, password string) error
-	DeleteUser(id int64) error
+	CreateUser(ctx context.Context, username, email, password string) (sqlc.FMUser, error)
+	CheckUserExists(ctx context.Context, id int64) (bool, error)
+	CheckUserEmailExists(ctx context.Context, email string) (bool, error)
+	GetUserById(ctx context.Context, id int64) (sqlc.FMUser, error)
+	GetUserByEmail(ctx context.Context, email string) (sqlc.FMUser, error)
+	GetAllUsers(ctx context.Context, page, pagesize int32) ([]sqlc.FMUser, error)
+	UpdateUser(ictx context.Context, d int64, username, email string, password string) error
+	DeleteUser(ctx context.Context, id int64) error
 }
 
 type userRepositoryImpl struct {
@@ -30,54 +30,54 @@ func NewUserRepository(pool *pgxpool.Pool) UserRepository {
 	}
 }
 
-func (u *userRepositoryImpl) CreateUser(username, email, password string) (sqlc.FianaceManagerFMUser, error) {
-	user, err := u.queries.CreateUser(context.Background(), sqlc.CreateUserParams{
+func (u *userRepositoryImpl) CreateUser(ctx context.Context, username, email, password string) (sqlc.FMUser, error) {
+	user, err := u.queries.CreateUser(ctx, sqlc.CreateUserParams{
 		Username: username,
 		Email:    email,
 		Password: password,
 	})
 	if err != nil {
-		return sqlc.FianaceManagerFMUser{}, err
+		return sqlc.FMUser{}, err
 	}
 	return user, nil
 }
 
-func (u *userRepositoryImpl) CheckUserExists(id int64) (bool, error) {
-	exists, err := u.queries.CheckUserExists(context.Background(), id)
+func (u *userRepositoryImpl) CheckUserExists(ctx context.Context, id int64) (bool, error) {
+	exists, err := u.queries.CheckUserExists(ctx, id)
 	if err != nil {
 		return false, err
 	}
 	return exists, nil
 }
 
-func (u *userRepositoryImpl) CheckUserEmailExists(email string) (bool, error) {
-	exists, err := u.queries.CheckUserEmailExists(context.Background(), email)
+func (u *userRepositoryImpl) CheckUserEmailExists(ctx context.Context, email string) (bool, error) {
+	exists, err := u.queries.CheckUserEmailExists(ctx, email)
 	if err != nil {
 		return false, err
 	}
 	return exists, nil
 }
 
-func (u *userRepositoryImpl) GetUserById(id int64) (sqlc.FianaceManagerFMUser, error) {
-	user, err := u.queries.GetUserById(context.Background(), id)
+func (u *userRepositoryImpl) GetUserById(ctx context.Context, id int64) (sqlc.FMUser, error) {
+	user, err := u.queries.GetUserById(ctx, id)
 	if err != nil {
-		return sqlc.FianaceManagerFMUser{}, err
+		return sqlc.FMUser{}, err
 	}
 	return user, nil
 }
 
-func (u *userRepositoryImpl) GetUserByEmail(email string) (sqlc.FianaceManagerFMUser, error) {
-	user, err := u.queries.GetUserByEmail(context.Background(), email)
+func (u *userRepositoryImpl) GetUserByEmail(ctx context.Context, email string) (sqlc.FMUser, error) {
+	user, err := u.queries.GetUserByEmail(ctx, email)
 	if err != nil {
-		return sqlc.FianaceManagerFMUser{}, err
+		return sqlc.FMUser{}, err
 	}
 	return user, nil
 }
 
-func (u *userRepositoryImpl) GetAllUsers(page, pagesize int32) ([]sqlc.FianaceManagerFMUser, error) {
+func (u *userRepositoryImpl) GetAllUsers(ctx context.Context, page, pagesize int32) ([]sqlc.FMUser, error) {
 	offset := (page - 1) * pagesize
 
-	users, err := u.queries.GetAllUsers(context.Background(), sqlc.GetAllUsersParams{
+	users, err := u.queries.GetAllUsers(ctx, sqlc.GetAllUsersParams{
 		Limit:  pagesize,
 		Offset: offset,
 	})
@@ -87,8 +87,8 @@ func (u *userRepositoryImpl) GetAllUsers(page, pagesize int32) ([]sqlc.FianaceMa
 	return users, nil
 }
 
-func (u *userRepositoryImpl) UpdateUser(id int64, username, email string, password string) error {
-	err := u.queries.UpdateUser(context.Background(), sqlc.UpdateUserParams{
+func (u *userRepositoryImpl) UpdateUser(ctx context.Context, id int64, username, email string, password string) error {
+	err := u.queries.UpdateUser(ctx, sqlc.UpdateUserParams{
 		ID:       id,
 		Username: username,
 		Email:    email,
@@ -100,8 +100,8 @@ func (u *userRepositoryImpl) UpdateUser(id int64, username, email string, passwo
 	return nil
 }
 
-func (u *userRepositoryImpl) DeleteUser(id int64) error {
-	err := u.queries.DeleteUser(context.Background(), id)
+func (u *userRepositoryImpl) DeleteUser(ctx context.Context, id int64) error {
+	err := u.queries.DeleteUser(ctx, id)
 	if err != nil {
 		return err
 	}

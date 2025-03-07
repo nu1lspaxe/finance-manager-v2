@@ -17,34 +17,40 @@ func NewUserController(service *UserService) *UserController {
 	return &UserController{service: service}
 }
 
-func (c *UserController) CreateUser(context context.Context, req *proto.CreateUserRequest) (*proto.UserResponse, error) {
+func (c *UserController) CreateUser(ctx context.Context, req *proto.CreateUserRequest) (*proto.UserResponse, error) {
 	err := protovalidate.Validate(req)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := c.service.CreateUser(req.Username, req.Email, req.Password)
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	user, err := c.service.CreateUser(ctx, req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
 	return &proto.UserResponse{User: utils.SqlcToProto(*user)}, nil
 }
 
-func (c *UserController) GetUser(context context.Context, req *proto.GetUserRequest) (*proto.UserResponse, error) {
-	user, err := c.service.GetUser(req.Id)
+func (c *UserController) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.UserResponse, error) {
+	user, err := c.service.GetUser(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 	return &proto.UserResponse{User: utils.SqlcToProto(*user)}, nil
 }
 
-func (c *UserController) GetAllUsers(context context.Context, req *proto.GetAllUsersRequest) (*proto.GetAllUsersResponse, error) {
+func (c *UserController) GetAllUsers(ctx context.Context, req *proto.GetAllUsersRequest) (*proto.GetAllUsersResponse, error) {
 	err := protovalidate.Validate(req)
 	if err != nil {
 		return nil, err
 	}
 
-	users, err := c.service.GetAllUsers(req.Page, req.PageSize)
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	users, err := c.service.GetAllUsers(ctx, req.Page, req.PageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -56,21 +62,27 @@ func (c *UserController) GetAllUsers(context context.Context, req *proto.GetAllU
 	return &proto.GetAllUsersResponse{Users: protoUsers}, nil
 }
 
-func (c *UserController) UpdateUser(context context.Context, req *proto.UpdateUserRequest) (*proto.UpdateUserResponse, error) {
+func (c *UserController) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest) (*proto.UpdateUserResponse, error) {
 	err := protovalidate.Validate(req)
 	if err != nil {
 		return nil, err
 	}
 
-	err = c.service.UpdateUser(req.Id, req.Username, req.Email, req.Password)
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	err = c.service.UpdateUser(ctx, req.Id, req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
 	return &proto.UpdateUserResponse{Success: true}, nil
 }
 
-func (c *UserController) DeleteUser(context context.Context, req *proto.DeleteUserRequest) (*proto.DeleteUserResponse, error) {
-	err := c.service.DeleteUser(req.Id)
+func (c *UserController) DeleteUser(ctx context.Context, req *proto.DeleteUserRequest) (*proto.DeleteUserResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	err := c.service.DeleteUser(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
