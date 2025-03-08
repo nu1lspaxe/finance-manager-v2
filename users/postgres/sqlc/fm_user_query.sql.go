@@ -9,6 +9,50 @@ import (
 	"context"
 )
 
+const addAccount = `-- name: AddAccount :one
+INSERT INTO "FM_Account" (user_id, id_number, balance)
+VALUES ($1, $2, $3)
+RETURNING id, user_id, id_number, balance, created_at, updated_at
+`
+
+type AddAccountParams struct {
+	UserID   int64   `json:"user_id"`
+	IDNumber string  `json:"id_number"`
+	Balance  float64 `json:"balance"`
+}
+
+func (q *Queries) AddAccount(ctx context.Context, arg AddAccountParams) (FMAccount, error) {
+	row := q.db.QueryRow(ctx, addAccount, arg.UserID, arg.IDNumber, arg.Balance)
+	var i FMAccount
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.IDNumber,
+		&i.Balance,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const checkAccountExists = `-- name: CheckAccountExists :one
+SELECT EXISTS (
+  SELECT 1 FROM "FM_Account" WHERE user_id = $1 AND id_number = $2
+) AS account_exists
+`
+
+type CheckAccountExistsParams struct {
+	UserID   int64  `json:"user_id"`
+	IDNumber string `json:"id_number"`
+}
+
+func (q *Queries) CheckAccountExists(ctx context.Context, arg CheckAccountExistsParams) (bool, error) {
+	row := q.db.QueryRow(ctx, checkAccountExists, arg.UserID, arg.IDNumber)
+	var account_exists bool
+	err := row.Scan(&account_exists)
+	return account_exists, err
+}
+
 const checkUserEmailExists = `-- name: CheckUserEmailExists :one
 SELECT EXISTS (
   SELECT 1 FROM "FM_User" WHERE email = $1
@@ -63,6 +107,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (FMUser,
 	return i, err
 }
 
+const deleteAccount = `-- name: DeleteAccount :exec
+DELETE FROM "FM_Account" WHERE id_number = $1
+`
+
+func (q *Queries) DeleteAccount(ctx context.Context, idNumber string) error {
+	_, err := q.db.Exec(ctx, deleteAccount, idNumber)
+	return err
+}
+
 const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM "FM_User" WHERE id = $1
 `
@@ -95,6 +148,37 @@ func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]FMU
 			&i.Username,
 			&i.Email,
 			&i.Password,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserAccounts = `-- name: GetUserAccounts :many
+SELECT id, user_id, id_number, balance, created_at, updated_at FROM "FM_Account" WHERE user_id = $1
+`
+
+func (q *Queries) GetUserAccounts(ctx context.Context, userID int64) ([]FMAccount, error) {
+	rows, err := q.db.Query(ctx, getUserAccounts, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FMAccount
+	for rows.Next() {
+		var i FMAccount
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.IDNumber,
+			&i.Balance,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -142,6 +226,20 @@ func (q *Queries) GetUserById(ctx context.Context, id int64) (FMUser, error) {
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updateAccountBalance = `-- name: UpdateAccountBalance :exec
+UPDATE "FM_Account" SET balance = $2, updated_at = NOW() WHERE id = $1
+`
+
+type UpdateAccountBalanceParams struct {
+	ID      int64   `json:"id"`
+	Balance float64 `json:"balance"`
+}
+
+func (q *Queries) UpdateAccountBalance(ctx context.Context, arg UpdateAccountBalanceParams) error {
+	_, err := q.db.Exec(ctx, updateAccountBalance, arg.ID, arg.Balance)
+	return err
 }
 
 const updateUser = `-- name: UpdateUser :exec

@@ -14,8 +14,14 @@ type UserRepository interface {
 	GetUserById(ctx context.Context, id int64) (sqlc.FMUser, error)
 	GetUserByEmail(ctx context.Context, email string) (sqlc.FMUser, error)
 	GetAllUsers(ctx context.Context, page, pagesize int32) ([]sqlc.FMUser, error)
-	UpdateUser(ictx context.Context, d int64, username, email string, password string) error
+	UpdateUser(ctx context.Context, d int64, username, email string, password string) error
 	DeleteUser(ctx context.Context, id int64) error
+
+	AddAccount(ctx context.Context, userId int64, idNumber string, balance float64) error
+	CheckAccountExists(ctx context.Context, userId int64, idNumber string) (bool, error)
+	GetUserAccounts(ctx context.Context, userId int64) ([]sqlc.FMAccount, error)
+	UpdateAccountBalance(ctx context.Context, id int64, balance float64) error
+	DeleteAccount(ctx context.Context, idNumber string) error
 }
 
 type userRepositoryImpl struct {
@@ -102,6 +108,56 @@ func (u *userRepositoryImpl) UpdateUser(ctx context.Context, id int64, username,
 
 func (u *userRepositoryImpl) DeleteUser(ctx context.Context, id int64) error {
 	err := u.queries.DeleteUser(ctx, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *userRepositoryImpl) AddAccount(ctx context.Context, userId int64, idNumber string, balance float64) error {
+	_, err := u.queries.AddAccount(ctx, sqlc.AddAccountParams{
+		UserID:   userId,
+		IDNumber: idNumber,
+		Balance:  balance,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *userRepositoryImpl) CheckAccountExists(ctx context.Context, userId int64, idNumber string) (bool, error) {
+	exists, err := u.queries.CheckAccountExists(ctx, sqlc.CheckAccountExistsParams{
+		UserID:   userId,
+		IDNumber: idNumber,
+	})
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
+func (u *userRepositoryImpl) GetUserAccounts(ctx context.Context, userId int64) ([]sqlc.FMAccount, error) {
+	accounts, err := u.queries.GetUserAccounts(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}
+
+func (u *userRepositoryImpl) UpdateAccountBalance(ctx context.Context, id int64, balance float64) error {
+	err := u.queries.UpdateAccountBalance(ctx, sqlc.UpdateAccountBalanceParams{
+		ID:      id,
+		Balance: balance,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *userRepositoryImpl) DeleteAccount(ctx context.Context, idNumber string) error {
+	err := u.queries.DeleteAccount(ctx, idNumber)
 	if err != nil {
 		return err
 	}

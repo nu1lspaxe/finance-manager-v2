@@ -15,6 +15,52 @@ type UserRepository struct {
 	mock.Mock
 }
 
+// AddAccount provides a mock function with given fields: ctx, userId, idNumber, balance
+func (_m *UserRepository) AddAccount(ctx context.Context, userId int64, idNumber string, balance float64) error {
+	ret := _m.Called(ctx, userId, idNumber, balance)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddAccount")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string, float64) error); ok {
+		r0 = rf(ctx, userId, idNumber, balance)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CheckAccountExists provides a mock function with given fields: ctx, userId, idNumber
+func (_m *UserRepository) CheckAccountExists(ctx context.Context, userId int64, idNumber string) (bool, error) {
+	ret := _m.Called(ctx, userId, idNumber)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CheckAccountExists")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string) (bool, error)); ok {
+		return rf(ctx, userId, idNumber)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int64, string) bool); ok {
+		r0 = rf(ctx, userId, idNumber)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int64, string) error); ok {
+		r1 = rf(ctx, userId, idNumber)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CheckUserEmailExists provides a mock function with given fields: ctx, email
 func (_m *UserRepository) CheckUserEmailExists(ctx context.Context, email string) (bool, error) {
 	ret := _m.Called(ctx, email)
@@ -99,6 +145,24 @@ func (_m *UserRepository) CreateUser(ctx context.Context, username string, email
 	return r0, r1
 }
 
+// DeleteAccount provides a mock function with given fields: ctx, idNumber
+func (_m *UserRepository) DeleteAccount(ctx context.Context, idNumber string) error {
+	ret := _m.Called(ctx, idNumber)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteAccount")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, idNumber)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteUser provides a mock function with given fields: ctx, id
 func (_m *UserRepository) DeleteUser(ctx context.Context, id int64) error {
 	ret := _m.Called(ctx, id)
@@ -140,6 +204,36 @@ func (_m *UserRepository) GetAllUsers(ctx context.Context, page int32, pagesize 
 
 	if rf, ok := ret.Get(1).(func(context.Context, int32, int32) error); ok {
 		r1 = rf(ctx, page, pagesize)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetUserAccounts provides a mock function with given fields: ctx, userId
+func (_m *UserRepository) GetUserAccounts(ctx context.Context, userId int64) ([]sqlc.FMAccount, error) {
+	ret := _m.Called(ctx, userId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetUserAccounts")
+	}
+
+	var r0 []sqlc.FMAccount
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) ([]sqlc.FMAccount, error)); ok {
+		return rf(ctx, userId)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int64) []sqlc.FMAccount); ok {
+		r0 = rf(ctx, userId)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]sqlc.FMAccount)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, userId)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -203,9 +297,27 @@ func (_m *UserRepository) GetUserById(ctx context.Context, id int64) (sqlc.FMUse
 	return r0, r1
 }
 
-// UpdateUser provides a mock function with given fields: ictx, d, username, email, password
-func (_m *UserRepository) UpdateUser(ictx context.Context, d int64, username string, email string, password string) error {
-	ret := _m.Called(ictx, d, username, email, password)
+// UpdateAccountBalance provides a mock function with given fields: ctx, id, balance
+func (_m *UserRepository) UpdateAccountBalance(ctx context.Context, id int64, balance float64) error {
+	ret := _m.Called(ctx, id, balance)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateAccountBalance")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64, float64) error); ok {
+		r0 = rf(ctx, id, balance)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateUser provides a mock function with given fields: ctx, d, username, email, password
+func (_m *UserRepository) UpdateUser(ctx context.Context, d int64, username string, email string, password string) error {
+	ret := _m.Called(ctx, d, username, email, password)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateUser")
@@ -213,7 +325,7 @@ func (_m *UserRepository) UpdateUser(ictx context.Context, d int64, username str
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, int64, string, string, string) error); ok {
-		r0 = rf(ictx, d, username, email, password)
+		r0 = rf(ctx, d, username, email, password)
 	} else {
 		r0 = ret.Error(0)
 	}

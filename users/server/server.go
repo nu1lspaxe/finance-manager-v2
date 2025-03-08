@@ -10,7 +10,9 @@ import (
 	"syscall"
 	"users/pkg"
 	"users/proto"
+	"users/utils"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -20,6 +22,10 @@ type Server struct {
 	grpcServer *GrpcServer
 	gateway    *GatewayServer
 	Logger     *zap.Logger
+	repository pkg.UserRepository
+	service    *pkg.UserService
+	controller *pkg.UserController
+	pool       *pgxpool.Pool
 }
 
 func NewServer() (*Server, error) {
@@ -29,7 +35,7 @@ func NewServer() (*Server, error) {
 	}
 	zap.ReplaceGlobals(logger)
 
-	tlsConfig, err := LoadTLSConfig()
+	tlsConfig, err := utils.LoadTLSConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -37,28 +43,38 @@ func NewServer() (*Server, error) {
 	grpcServer := NewGrpcServer(tlsConfig, logger)
 	gateway := NewGatewayServer(tlsConfig, logger)
 
-	return &Server{
+	ctx := context.Background()
+	connStr := viper.GetString("postgres.connection_string")
+	pool, err := SetPGConn(ctx, connStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %v", err)
+	}
+
+	repo := pkg.NewUserRepository(pool)
+	service := pkg.NewUserService(repo, tlsConfig)
+	controller := pkg.NewUserController(service)
+
+	server := &Server{
 		grpcServer: grpcServer,
 		gateway:    gateway,
 		Logger:     logger,
-	}, nil
+		repository: repo,
+		service:    service,
+		controller: controller,
+		pool:       pool,
+	}
+
+	proto.RegisterUserServiceServer(grpcServer.server, controller)
+
+	return server, nil
 }
 
 func (s *Server) Run() error {
-	defer s.Logger.Sync()
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	connStr := viper.GetString("postgres.connection_string")
 	grpcPort := viper.GetString("ports.grpc")
 	httpPort := viper.GetString("ports.http")
-
-	pool, err := SetPGConn(ctx, connStr)
-	if err != nil {
-		return err
-	}
-	defer pool.Close()
 
 	grpcLis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	if err != nil {
@@ -78,11 +94,6 @@ func (s *Server) Run() error {
 		}
 	}()
 
-	repo := pkg.NewUserRepository(pool)
-	service := pkg.NewUserService(repo)
-	controller := pkg.NewUserController(service)
-	proto.RegisterUserServiceServer(s.grpcServer.server, controller)
-
 	s.Logger.Info("server started", zap.String("grpc", grpcPort), zap.String("http", httpPort))
 
 	quit := make(chan os.Signal, 1)
@@ -90,11 +101,19 @@ func (s *Server) Run() error {
 
 	select {
 	case err := <-errChan:
-		s.grpcServer.server.GracefulStop()
+		s.Shutddown()
 		return err
 	case <-quit:
-		s.grpcServer.server.GracefulStop()
+		s.Shutddown()
 	}
 
 	return nil
+}
+
+func (s *Server) Shutddown() {
+	defer s.Logger.Sync()
+	defer s.pool.Close()
+	s.grpcServer.server.GracefulStop()
+	s.gateway.server.Shutdown(context.Background())
+	s.Logger.Info("server shutdown...")
 }

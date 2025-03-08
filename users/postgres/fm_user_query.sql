@@ -30,7 +30,21 @@ UPDATE "FM_User" SET username = $2, email = $3, password = $4, updated_at = NOW(
 -- name: DeleteUser :exec
 DELETE FROM "FM_User" WHERE id = $1;
 
--- name: CreateAccount :one
-INSERT INTO "FM_Account" (user_id, account_number)
-VALUES ($1, $2)
+-- name: AddAccount :one
+INSERT INTO "FM_Account" (user_id, id_number, balance)
+VALUES ($1, $2, $3)
 RETURNING *;
+
+-- name: GetUserAccounts :many
+SELECT * FROM "FM_Account" WHERE user_id = $1;
+
+-- name: CheckAccountExists :one
+SELECT EXISTS (
+  SELECT 1 FROM "FM_Account" WHERE user_id = $1 AND id_number = $2
+) AS account_exists;
+
+-- name: UpdateAccountBalance :exec
+UPDATE "FM_Account" SET balance = $2, updated_at = NOW() WHERE id = $1;
+
+-- name: DeleteAccount :exec
+DELETE FROM "FM_Account" WHERE id_number = $1;

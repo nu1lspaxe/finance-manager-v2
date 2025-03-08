@@ -35,6 +35,26 @@ service UserService {
             delete: "/v1/users/{id}"
         };
     }
+    
+    rpc AddUserAccount(UserAccountRequest) returns (UserAccountResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/{id}/accounts/{id_number}"
+            body: "*"
+        };
+    }
+    rpc GetUserAccounts(GetUserAccountsRequest) returns (GetUserAccountsResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{id}/accounts"
+        };
+    }
+    rpc DeleteUserAccount(UserAccountRequest) returns (UserAccountResponse) {
+        option (google.api.http) = {
+            delete: "/v1/users/{id}/accounts/{id_number}"
+        };
+    }
+
+    rpc UpdateUserAccountBalance(UserAccountRequest) returns (UserAccountResponse) {}
+
     // rpc Login(LoginRequest) returns (LoginResponse) {
     //     option (google.api.http) = {
     //         post: "/v1/users/login"
@@ -56,6 +76,11 @@ message User {
     string password = 4;
     int64 created_at = 5;
     int64 updated_at = 6;
+}
+
+message UserAccount {
+    string id_number = 1;
+    double balance = 2;
 }
 
 message CreateUserRequest {
@@ -172,6 +197,23 @@ message DeleteUserRequest {
 
 message DeleteUserResponse {
     bool success = 1;
+}
+
+message UserAccountRequest {
+    int64 id = 1;
+    string id_number = 2;
+}
+
+message UserAccountResponse {
+    bool success = 1;
+}
+
+message GetUserAccountsRequest {
+    int64 id = 1;
+}
+
+message GetUserAccountsResponse {
+    repeated UserAccount accounts = 1;
 }
 
 message LoginRequest {

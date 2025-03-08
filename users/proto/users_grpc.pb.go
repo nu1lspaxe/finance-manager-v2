@@ -19,11 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_CreateUser_FullMethodName  = "/users.UserService/CreateUser"
-	UserService_GetUser_FullMethodName     = "/users.UserService/GetUser"
-	UserService_GetAllUsers_FullMethodName = "/users.UserService/GetAllUsers"
-	UserService_UpdateUser_FullMethodName  = "/users.UserService/UpdateUser"
-	UserService_DeleteUser_FullMethodName  = "/users.UserService/DeleteUser"
+	UserService_CreateUser_FullMethodName               = "/users.UserService/CreateUser"
+	UserService_GetUser_FullMethodName                  = "/users.UserService/GetUser"
+	UserService_GetAllUsers_FullMethodName              = "/users.UserService/GetAllUsers"
+	UserService_UpdateUser_FullMethodName               = "/users.UserService/UpdateUser"
+	UserService_DeleteUser_FullMethodName               = "/users.UserService/DeleteUser"
+	UserService_AddUserAccount_FullMethodName           = "/users.UserService/AddUserAccount"
+	UserService_GetUserAccounts_FullMethodName          = "/users.UserService/GetUserAccounts"
+	UserService_DeleteUserAccount_FullMethodName        = "/users.UserService/DeleteUserAccount"
+	UserService_UpdateUserAccountBalance_FullMethodName = "/users.UserService/UpdateUserAccountBalance"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -35,6 +39,10 @@ type UserServiceClient interface {
 	GetAllUsers(ctx context.Context, in *GetAllUsersRequest, opts ...grpc.CallOption) (*GetAllUsersResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
+	AddUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error)
+	GetUserAccounts(ctx context.Context, in *GetUserAccountsRequest, opts ...grpc.CallOption) (*GetUserAccountsResponse, error)
+	DeleteUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error)
+	UpdateUserAccountBalance(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error)
 }
 
 type userServiceClient struct {
@@ -95,6 +103,46 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *DeleteUserReques
 	return out, nil
 }
 
+func (c *userServiceClient) AddUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserAccountResponse)
+	err := c.cc.Invoke(ctx, UserService_AddUserAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUserAccounts(ctx context.Context, in *GetUserAccountsRequest, opts ...grpc.CallOption) (*GetUserAccountsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserAccountsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUserAccounts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) DeleteUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserAccountResponse)
+	err := c.cc.Invoke(ctx, UserService_DeleteUserAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) UpdateUserAccountBalance(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserAccountResponse)
+	err := c.cc.Invoke(ctx, UserService_UpdateUserAccountBalance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -104,6 +152,10 @@ type UserServiceServer interface {
 	GetAllUsers(context.Context, *GetAllUsersRequest) (*GetAllUsersResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
+	AddUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error)
+	GetUserAccounts(context.Context, *GetUserAccountsRequest) (*GetUserAccountsResponse, error)
+	DeleteUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error)
+	UpdateUserAccountBalance(context.Context, *UserAccountRequest) (*UserAccountResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -128,6 +180,18 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserReq
 }
 func (UnimplementedUserServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedUserServiceServer) AddUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUserAccount not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserAccounts(context.Context, *GetUserAccountsRequest) (*GetUserAccountsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserAccounts not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserAccount not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateUserAccountBalance(context.Context, *UserAccountRequest) (*UserAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserAccountBalance not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -240,6 +304,78 @@ func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_AddUserAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddUserAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_AddUserAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddUserAccount(ctx, req.(*UserAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUserAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserAccountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUserAccounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserAccounts(ctx, req.(*GetUserAccountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_DeleteUserAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteUserAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeleteUserAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteUserAccount(ctx, req.(*UserAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_UpdateUserAccountBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateUserAccountBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UpdateUserAccountBalance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateUserAccountBalance(ctx, req.(*UserAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +402,22 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUser",
 			Handler:    _UserService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "AddUserAccount",
+			Handler:    _UserService_AddUserAccount_Handler,
+		},
+		{
+			MethodName: "GetUserAccounts",
+			Handler:    _UserService_GetUserAccounts_Handler,
+		},
+		{
+			MethodName: "DeleteUserAccount",
+			Handler:    _UserService_DeleteUserAccount_Handler,
+		},
+		{
+			MethodName: "UpdateUserAccountBalance",
+			Handler:    _UserService_UpdateUserAccountBalance_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

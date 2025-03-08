@@ -30,7 +30,7 @@ func (c *UserController) CreateUser(ctx context.Context, req *proto.CreateUserRe
 	if err != nil {
 		return nil, err
 	}
-	return &proto.UserResponse{User: utils.SqlcToProto(*user)}, nil
+	return &proto.UserResponse{User: utils.SqlcToProto_FMUser(*user)}, nil
 }
 
 func (c *UserController) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.UserResponse, error) {
@@ -38,7 +38,7 @@ func (c *UserController) GetUser(ctx context.Context, req *proto.GetUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.UserResponse{User: utils.SqlcToProto(*user)}, nil
+	return &proto.UserResponse{User: utils.SqlcToProto_FMUser(*user)}, nil
 }
 
 func (c *UserController) GetAllUsers(ctx context.Context, req *proto.GetAllUsersRequest) (*proto.GetAllUsersResponse, error) {
@@ -57,7 +57,7 @@ func (c *UserController) GetAllUsers(ctx context.Context, req *proto.GetAllUsers
 
 	protoUsers := make([]*proto.User, 0, len(*users))
 	for _, user := range *users {
-		protoUsers = append(protoUsers, utils.SqlcToProto(user))
+		protoUsers = append(protoUsers, utils.SqlcToProto_FMUser(user))
 	}
 	return &proto.GetAllUsersResponse{Users: protoUsers}, nil
 }
@@ -87,4 +87,41 @@ func (c *UserController) DeleteUser(ctx context.Context, req *proto.DeleteUserRe
 		return nil, err
 	}
 	return &proto.DeleteUserResponse{Success: true}, nil
+}
+
+func (c *UserController) AddUserAccount(ctx context.Context, req *proto.UserAccountRequest) (*proto.UserAccountResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	err := c.service.AddAccount(ctx, req.Id, req.IdNumber)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.UserAccountResponse{Success: true}, nil
+}
+
+func (c *UserController) GetUserAccounts(ctx context.Context, req *proto.GetUserAccountsRequest) (*proto.GetUserAccountsResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	accounts, err := c.service.GetUserAccounts(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	protoAccounts := make([]*proto.UserAccount, 0, len(*accounts))
+	for _, account := range *accounts {
+		protoAccounts = append(protoAccounts, utils.SqlcToProto_FMAccount(account))
+	}
+	return &proto.GetUserAccountsResponse{Accounts: protoAccounts}, nil
+}
+
+func (c *UserController) DeleteAccount(ctx context.Context, req *proto.UserAccountRequest) (*proto.UserAccountResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	err := c.service.DeleteAccount(ctx, req.IdNumber)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.UserAccountResponse{Success: true}, nil
 }

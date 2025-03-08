@@ -8,6 +8,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type FMAccount struct {
+	ID        int64              `json:"id"`
+	UserID    int64              `json:"user_id"`
+	IDNumber  string             `json:"id_number"`
+	Balance   float64            `json:"balance"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
 type FMUser struct {
 	ID        int64              `json:"id"`
 	Username  string             `json:"username"`
