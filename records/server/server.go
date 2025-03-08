@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"records/pkg"
 	"records/proto"
+	"records/utils"
 	"syscall"
 
 	"github.com/spf13/viper"
@@ -29,7 +30,7 @@ func NewServer() (*Server, error) {
 	}
 	zap.ReplaceGlobals(logger)
 
-	tlsConfig, err := LoadTLSConfig()
+	tlsConfig, err := utils.LoadTLSConfig()
 	if err != nil {
 		return nil, err
 	}
