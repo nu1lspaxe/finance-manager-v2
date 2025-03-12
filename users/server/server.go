@@ -13,15 +13,17 @@ import (
 	"users/utils"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/segmentio/kafka-go"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
 	grpcServer *GrpcServer
 	gateway    *GatewayServer
-	Logger     *zap.Logger
+	logger     *zap.Logger
 	repository pkg.UserRepository
 	service    *pkg.UserService
 	controller *pkg.UserController
@@ -50,14 +52,20 @@ func NewServer() (*Server, error) {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
 
+	kafkaWriter := &kafka.Writer{
+		Addr:     kafka.TCP("kafka:9092"),
+		Topic:    "bank-accounts",
+		Balancer: &kafka.LeastBytes{},
+	}
+
 	repo := pkg.NewUserRepository(pool)
-	service := pkg.NewUserService(repo, tlsConfig)
+	service := pkg.NewUserService(repo, tlsConfig, kafkaWriter)
 	controller := pkg.NewUserController(service)
 
 	server := &Server{
 		grpcServer: grpcServer,
 		gateway:    gateway,
-		Logger:     logger,
+		logger:     logger,
 		repository: repo,
 		service:    service,
 		controller: controller,
@@ -73,47 +81,51 @@ func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	grpcPort := viper.GetString("ports.grpc")
-	httpPort := viper.GetString("ports.http")
+	errGroup, ctx := errgroup.WithContext(ctx)
 
+	errGroup.Go(func() error {
+		s.StartCronJob(ctx)
+		return nil
+	})
+
+	grpcPort := viper.GetString("ports.grpc")
 	grpcLis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	if err != nil {
 		return err
 	}
-	errChan := make(chan error, 2)
+	errGroup.Go(func() error {
+		return s.grpcServer.Start(grpcLis)
+	})
 
-	go func() {
-		if err := s.grpcServer.Start(grpcLis); err != nil && err != grpc.ErrServerStopped {
-			errChan <- err
-		}
-	}()
+	httpPort := viper.GetString("ports.http")
+	errGroup.Go(func() error {
+		return s.gateway.Start(ctx, httpPort, grpcPort)
+	})
 
-	go func() {
-		if err := s.gateway.Start(ctx, httpPort, grpcPort); err != nil && err != http.ErrServerClosed {
-			errChan <- err
-		}
-	}()
-
-	s.Logger.Info("server started", zap.String("grpc", grpcPort), zap.String("http", httpPort))
+	s.logger.Info("server started", zap.String("grpc", grpcPort), zap.String("http", httpPort))
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	select {
-	case err := <-errChan:
-		s.Shutddown()
-		return err
+	case <-ctx.Done():
 	case <-quit:
-		s.Shutddown()
+		cancel()
 	}
 
+	s.Shutdown(ctx)
+	if err := errGroup.Wait(); err != nil && err != grpc.ErrServerStopped && err != http.ErrServerClosed {
+		return err
+	}
 	return nil
 }
 
-func (s *Server) Shutddown() {
-	defer s.Logger.Sync()
-	defer s.pool.Close()
+func (s *Server) Shutdown(ctx context.Context) {
+	defer s.logger.Sync()
+	if err := s.gateway.server.Shutdown(ctx); err != nil {
+		s.logger.Error("Failed to shutdown HTTP server:", zap.Error(err))
+	}
 	s.grpcServer.server.GracefulStop()
-	s.gateway.server.Shutdown(context.Background())
-	s.Logger.Info("server shutdown...")
+	s.pool.Close()
+	s.logger.Info("server shutdown...")
 }
