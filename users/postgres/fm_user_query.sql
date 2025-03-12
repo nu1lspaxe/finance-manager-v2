@@ -1,4 +1,4 @@
--- Table: User
+-- Table: FM_User
 
 -- name: CreateUser :one
 INSERT INTO "FM_User" (username, email, password)
@@ -22,13 +22,15 @@ SELECT * FROM "FM_User" WHERE id = $1;
 SELECT * FROM "FM_User" WHERE email = $1;
 
 -- name: GetAllUsers :many
-SELECT * FROM "FM_User" ORDER BY created_at OFFSET $1 LIMIT $2;
+SELECT id FROM "FM_User" ORDER BY created_at;
 
 -- name: UpdateUser :exec
 UPDATE "FM_User" SET username = $2, email = $3, password = $4, updated_at = NOW() WHERE id = $1;
 
 -- name: DeleteUser :exec
 DELETE FROM "FM_User" WHERE id = $1;
+
+-- table: FM_Account
 
 -- name: AddAccount :one
 INSERT INTO "FM_Account" (user_id, id_number, balance)

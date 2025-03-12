@@ -9,15 +9,17 @@ import (
 	"users/postgres/sqlc"
 	"users/utils"
 
+	"github.com/segmentio/kafka-go"
 	"github.com/spf13/viper"
 )
 
 type UserService struct {
-	repo       UserRepository
-	httpClient *http.Client
+	repo        UserRepository
+	httpClient  *http.Client
+	kafkaWriter *kafka.Writer
 }
 
-func NewUserService(repo UserRepository, tlsConfig *tls.Config) *UserService {
+func NewUserService(repo UserRepository, tlsConfig *tls.Config, kafkaWriter *kafka.Writer) *UserService {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig:   tlsConfig,
@@ -27,8 +29,9 @@ func NewUserService(repo UserRepository, tlsConfig *tls.Config) *UserService {
 	}
 
 	return &UserService{
-		repo:       repo,
-		httpClient: client,
+		repo:        repo,
+		httpClient:  client,
+		kafkaWriter: kafkaWriter,
 	}
 }
 
@@ -64,12 +67,12 @@ func (u *UserService) GetUser(ctx context.Context, userId int64) (*sqlc.FMUser, 
 	return &user, nil
 }
 
-func (u *UserService) GetAllUsers(ctx context.Context, page, pagesize int32) (*[]sqlc.FMUser, error) {
-	users, err := u.repo.GetAllUsers(ctx, page, pagesize)
+func (u *UserService) GetAllUsers(ctx context.Context) ([]int64, error) {
+	userIds, err := u.repo.GetAllUsers(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &users, nil
+	return userIds, nil
 }
 
 func (u *UserService) UpdateUser(ctx context.Context, userId int64, username, email, password string) error {
@@ -144,10 +147,6 @@ func (u *UserService) GetUserAccounts(ctx context.Context, userId int64) (*[]sql
 	return &accounts, nil
 }
 
-func (u *UserService) UpdateAccountBalance(ctx context.Context, accountId int64, balance float64) error {
-	return u.repo.UpdateAccountBalance(ctx, accountId, balance)
-}
-
-func (u *UserService) DeleteAccount(ctx context.Context, id_number string) error {
-	return u.repo.DeleteAccount(ctx, id_number)
+func (u *UserService) DeleteAccount(ctx context.Context, idNumber string) error {
+	return u.repo.DeleteAccount(ctx, idNumber)
 }

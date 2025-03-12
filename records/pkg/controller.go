@@ -52,7 +52,10 @@ func (r *RecordController) GetRecord(ctx context.Context, req *proto.GetRecordRe
 	return &proto.RecordResponse{Record: protoRecord}, nil
 }
 
-func (r *RecordController) GetUserRecordsWithFilters(req *proto.GetUserRecordsWithFiltersRequest, stream proto.RecordService_GetUserRecordsWithFiltersServer) error {
+func (r *RecordController) GetUserRecordsWithFilters(
+	req *proto.GetUserRecordsWithFiltersRequest,
+	stream proto.RecordService_GetUserRecordsWithFiltersServer,
+) error {
 	err := protovalidate.Validate(req)
 	if err != nil {
 		return err
@@ -65,6 +68,7 @@ func (r *RecordController) GetUserRecordsWithFilters(req *proto.GetUserRecordsWi
 	if err != nil {
 		return err
 	}
+
 	for _, record := range *records {
 		protoRecord, err := utils.SqlcToProto(&record)
 		if err != nil {

@@ -1,6 +1,8 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	ErrUserNotFound = iota + 1
@@ -9,6 +11,7 @@ const (
 	ErrUserInvalid
 	ErrAccountExists
 	ErrStatusCode
+	ErrUpdateAccountBalance
 )
 
 type UserError struct {
@@ -39,6 +42,8 @@ func GetErrorMessage(code int, opts ...string) string {
 		return fmt.Sprintf("account already exists: %v", opts)
 	case ErrStatusCode:
 		return fmt.Sprintf("status code error: %v", opts)
+	case ErrUpdateAccountBalance:
+		return fmt.Sprintf("failed to update account balance: %v", opts)
 	default:
 		return "unknown error"
 	}

@@ -30,7 +30,7 @@ func (c *UserController) CreateUser(ctx context.Context, req *proto.CreateUserRe
 	if err != nil {
 		return nil, err
 	}
-	return &proto.UserResponse{User: utils.SqlcToProto_FMUser(*user)}, nil
+	return &proto.UserResponse{User: utils.SqlcToProto_FMUser(user)}, nil
 }
 
 func (c *UserController) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.UserResponse, error) {
@@ -38,28 +38,26 @@ func (c *UserController) GetUser(ctx context.Context, req *proto.GetUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.UserResponse{User: utils.SqlcToProto_FMUser(*user)}, nil
+	return &proto.UserResponse{User: utils.SqlcToProto_FMUser(user)}, nil
 }
 
-func (c *UserController) GetAllUsers(ctx context.Context, req *proto.GetAllUsersRequest) (*proto.GetAllUsersResponse, error) {
-	err := protovalidate.Validate(req)
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+func (c *UserController) GetAllUsers(_ *proto.EmptyRequest, stream proto.UserService_GetAllUsersServer) error {
+	ctx, cancel := context.WithTimeout(stream.Context(), utils.TIMEOUT)
 	defer cancel()
 
-	users, err := c.service.GetAllUsers(ctx, req.Page, req.PageSize)
+	userIds, err := c.service.GetAllUsers(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	protoUsers := make([]*proto.User, 0, len(*users))
-	for _, user := range *users {
-		protoUsers = append(protoUsers, utils.SqlcToProto_FMUser(user))
+	for _, userId := range userIds {
+		err := stream.Send(&proto.UserIdResponse{Id: userId})
+		if err != nil {
+			return err
+		}
 	}
-	return &proto.GetAllUsersResponse{Users: protoUsers}, nil
+
+	return nil
 }
 
 func (c *UserController) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest) (*proto.UpdateUserResponse, error) {

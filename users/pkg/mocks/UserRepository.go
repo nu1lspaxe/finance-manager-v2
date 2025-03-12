@@ -181,29 +181,29 @@ func (_m *UserRepository) DeleteUser(ctx context.Context, id int64) error {
 	return r0
 }
 
-// GetAllUsers provides a mock function with given fields: ctx, page, pagesize
-func (_m *UserRepository) GetAllUsers(ctx context.Context, page int32, pagesize int32) ([]sqlc.FMUser, error) {
-	ret := _m.Called(ctx, page, pagesize)
+// GetAllUsers provides a mock function with given fields: ctx
+func (_m *UserRepository) GetAllUsers(ctx context.Context) ([]int64, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAllUsers")
 	}
 
-	var r0 []sqlc.FMUser
+	var r0 []int64
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int32, int32) ([]sqlc.FMUser, error)); ok {
-		return rf(ctx, page, pagesize)
+	if rf, ok := ret.Get(0).(func(context.Context) ([]int64, error)); ok {
+		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int32, int32) []sqlc.FMUser); ok {
-		r0 = rf(ctx, page, pagesize)
+	if rf, ok := ret.Get(0).(func(context.Context) []int64); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.FMUser)
+			r0 = ret.Get(0).([]int64)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, int32, int32) error); ok {
-		r1 = rf(ctx, page, pagesize)
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}

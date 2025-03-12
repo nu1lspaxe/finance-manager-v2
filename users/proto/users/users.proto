@@ -19,7 +19,7 @@ service UserService {
             get: "/v1/users/{id}"
         };
     }
-    rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse) {
+    rpc GetAllUsers(EmptyRequest) returns (stream UserIdResponse) {
         option (google.api.http) = {
             get: "/v1/users"
         };
@@ -126,21 +126,18 @@ message CreateUserRequest {
     }];
 }
 
+message EmptyRequest {}
+
+message UserIdResponse {
+    int64 id = 1;
+}
+
 message GetUserRequest {
     int64 id = 1;
 }
 
 message UserResponse {
     User user = 1;
-}
-
-message GetAllUsersRequest {
-    int32 page = 1 [(buf.validate.field).int32 = {gt: 0}];
-    int32 page_size = 2 [(buf.validate.field).int32 = {gt: 0}];
-}
-
-message GetAllUsersResponse {
-    repeated User users = 1;
 }
 
 message UpdateUserRequest {

@@ -13,7 +13,7 @@ type UserRepository interface {
 	CheckUserEmailExists(ctx context.Context, email string) (bool, error)
 	GetUserById(ctx context.Context, id int64) (sqlc.FMUser, error)
 	GetUserByEmail(ctx context.Context, email string) (sqlc.FMUser, error)
-	GetAllUsers(ctx context.Context, page, pagesize int32) ([]sqlc.FMUser, error)
+	GetAllUsers(ctx context.Context) ([]int64, error)
 	UpdateUser(ctx context.Context, d int64, username, email string, password string) error
 	DeleteUser(ctx context.Context, id int64) error
 
@@ -80,13 +80,8 @@ func (u *userRepositoryImpl) GetUserByEmail(ctx context.Context, email string) (
 	return user, nil
 }
 
-func (u *userRepositoryImpl) GetAllUsers(ctx context.Context, page, pagesize int32) ([]sqlc.FMUser, error) {
-	offset := (page - 1) * pagesize
-
-	users, err := u.queries.GetAllUsers(ctx, sqlc.GetAllUsersParams{
-		Limit:  pagesize,
-		Offset: offset,
-	})
+func (u *userRepositoryImpl) GetAllUsers(ctx context.Context) ([]int64, error) {
+	users, err := u.queries.GetAllUsers(ctx)
 	if err != nil {
 		return nil, err
 	}

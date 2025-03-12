@@ -10,6 +10,7 @@ import (
 )
 
 const addAccount = `-- name: AddAccount :one
+
 INSERT INTO "FM_Account" (user_id, id_number, balance)
 VALUES ($1, $2, $3)
 RETURNING id, user_id, id_number, balance, created_at, updated_at
@@ -21,6 +22,7 @@ type AddAccountParams struct {
 	Balance  float64 `json:"balance"`
 }
 
+// table: FM_Account
 func (q *Queries) AddAccount(ctx context.Context, arg AddAccountParams) (FMAccount, error) {
 	row := q.db.QueryRow(ctx, addAccount, arg.UserID, arg.IDNumber, arg.Balance)
 	var i FMAccount
@@ -92,7 +94,7 @@ type CreateUserParams struct {
 	Password string `json:"password"`
 }
 
-// Table: User
+// Table: FM_User
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (FMUser, error) {
 	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.Email, arg.Password)
 	var i FMUser
@@ -126,34 +128,22 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, username, email, password, created_at, updated_at FROM "FM_User" ORDER BY created_at OFFSET $1 LIMIT $2
+SELECT id FROM "FM_User" ORDER BY created_at
 `
 
-type GetAllUsersParams struct {
-	Offset int32 `json:"offset"`
-	Limit  int32 `json:"limit"`
-}
-
-func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]FMUser, error) {
-	rows, err := q.db.Query(ctx, getAllUsers, arg.Offset, arg.Limit)
+func (q *Queries) GetAllUsers(ctx context.Context) ([]int64, error) {
+	rows, err := q.db.Query(ctx, getAllUsers)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []FMUser
+	var items []int64
 	for rows.Next() {
-		var i FMUser
-		if err := rows.Scan(
-			&i.ID,
-			&i.Username,
-			&i.Email,
-			&i.Password,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
 			return nil, err
 		}
-		items = append(items, i)
+		items = append(items, id)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

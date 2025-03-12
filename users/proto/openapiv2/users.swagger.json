@@ -21,9 +21,18 @@
         "operationId": "UserService_GetAllUsers",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "A successful response.(streaming responses)",
             "schema": {
-              "$ref": "#/definitions/usersGetAllUsersResponse"
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/usersUserIdResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of usersUserIdResponse"
             }
           },
           "default": {
@@ -33,22 +42,6 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
         "tags": [
           "UserService"
         ]
@@ -361,18 +354,6 @@
         }
       }
     },
-    "usersGetAllUsersResponse": {
-      "type": "object",
-      "properties": {
-        "users": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/usersUser"
-          }
-        }
-      }
-    },
     "usersGetUserAccountsResponse": {
       "type": "object",
       "properties": {
@@ -436,6 +417,15 @@
       "properties": {
         "success": {
           "type": "boolean"
+        }
+      }
+    },
+    "usersUserIdResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
