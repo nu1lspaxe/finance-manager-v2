@@ -26,7 +26,7 @@ type CreateRecordParams struct {
 	Detail          string      `json:"detail"`
 }
 
-// Table: Record
+// Table: FM_Record
 func (q *Queries) CreateRecord(ctx context.Context, arg CreateRecordParams) (FMRecord, error) {
 	row := q.db.QueryRow(ctx, createRecord,
 		arg.UserID,

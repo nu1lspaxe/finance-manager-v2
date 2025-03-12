@@ -43,6 +43,11 @@ service RecordService {
   }
 }
 
+enum RecordType {
+  INCOME = 0;
+  EXPENSE = 1;
+}
+
 message Record {
   int64 id = 1;             
   int64 user_id = 2;       
@@ -95,9 +100,4 @@ message UpdateRecordResponse {
 
 message DeleteRecordResponse {
   bool success = 1;
-}
-
-enum RecordType {
-  INCOME = 0;
-  EXPENSE = 1;
 }

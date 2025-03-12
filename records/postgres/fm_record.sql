@@ -9,6 +9,6 @@ CREATE TABLE IF NOT EXISTS "FM_Record" (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_record_user_id_transaction_date ON "FM_Record" (user_id, transaction_date);
+CREATE INDEX IF NOT EXISTS idx_record_user_id_date ON "FM_Record" (user_id, transaction_date);
 
-CREATE INDEX idx_record_user_id_type ON "FM_Record" (user_id, record_type);
+CREATE INDEX IF NOT EXISTS idx_record_user_id_type ON "FM_Record" (user_id, record_type);

@@ -1,4 +1,4 @@
--- Table: Record
+-- Table: FM_Record
 
 -- name: CreateRecord :one
 INSERT INTO "FM_Record" (user_id, amount, transaction_date, record_type, detail)
