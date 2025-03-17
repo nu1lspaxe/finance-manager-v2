@@ -10,9 +10,11 @@ const (
 	ErrInvalidTransactionType
 	ErrInvalidAmount
 
+	// user
 	ErrEmailExists
-
+	// account
 	ErrInsufficientBalance
+	ErrAccountNotFound
 )
 
 type BankSystemError struct {
@@ -43,6 +45,8 @@ func GetErrorMessage(code int, opts ...string) string {
 		return fmt.Sprintf("email already exists: %v", opts)
 	case ErrInsufficientBalance:
 		return fmt.Sprintf("insufficient balance: %v", opts)
+	case ErrAccountNotFound:
+		return fmt.Sprintf("account not found: %v", opts)
 	default:
 		return "unknown error"
 	}

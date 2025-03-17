@@ -43,7 +43,21 @@ func (s *AccountService) GetAccountBalance(ctx context.Context, idNumber string)
 	return account.Balance, nil
 }
 
-// func (s *AccountService) GetAccountTransactions
+func (s *AccountService) GetAccountTransactions(ctx context.Context, idNumber string) (*[]sqlc.GetAccountTransactionsByIDNumberRow, error) {
+	exists, err := s.actRepo.CheckAccountIDNumberExists(ctx, idNumber)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, utils.NewBankSystemError(utils.ErrAccountNotFound)
+	}
+
+	transactions, err := s.actRepo.GetAccountTransactionsByIDNumber(ctx, idNumber)
+	if err != nil {
+		return nil, err
+	}
+	return &transactions, nil
+}
 
 func (s *AccountService) GetAllAccounts(ctx context.Context) (*[]sqlc.GetAllAccountsRow, error) {
 	accounts, err := s.actRepo.GetAllAccounts(ctx)

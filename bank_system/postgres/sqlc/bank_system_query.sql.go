@@ -11,6 +11,19 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const checkAccountIDNumberExists = `-- name: CheckAccountIDNumberExists :one
+SELECT EXISTS (
+  SELECT 1 FROM "BK_Account" WHERE id_number = $1
+) AS id_number_exists
+`
+
+func (q *Queries) CheckAccountIDNumberExists(ctx context.Context, idNumber string) (bool, error) {
+	row := q.db.QueryRow(ctx, checkAccountIDNumberExists, idNumber)
+	var id_number_exists bool
+	err := row.Scan(&id_number_exists)
+	return id_number_exists, err
+}
+
 const checkUserEmailExists = `-- name: CheckUserEmailExists :one
 SELECT EXISTS (
   SELECT 1 FROM "BK_User" WHERE email = $1

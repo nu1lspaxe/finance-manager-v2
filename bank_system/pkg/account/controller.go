@@ -1,11 +1,11 @@
 package account
 
 import (
+	"bank_system/utils"
 	"context"
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +31,7 @@ func (c *AccountController) CreateAccount(ctx *gin.Context) {
 	}
 
 	reqCtx := ctx.Request.Context()
-	reqCtx, cancel := context.WithTimeout(reqCtx, 5*time.Second)
+	reqCtx, cancel := context.WithTimeout(reqCtx, utils.TIMEOUT)
 	defer cancel()
 
 	account, err := c.service.CreateAccount(reqCtx, userID)
@@ -47,7 +47,7 @@ func (c *AccountController) GetAccountByAccountNumber(ctx *gin.Context) {
 	idNumber := ctx.Param("id_number")
 
 	reqCtx := ctx.Request.Context()
-	reqCtx, cancel := context.WithTimeout(reqCtx, 5*time.Second)
+	reqCtx, cancel := context.WithTimeout(reqCtx, utils.TIMEOUT)
 	defer cancel()
 
 	account, err := c.service.GetAccountByIDNumber(reqCtx, idNumber)
@@ -63,7 +63,7 @@ func (c *AccountController) GetAccountBalance(ctx *gin.Context) {
 	idNumber := ctx.Param("id_number")
 
 	reqCtx := ctx.Request.Context()
-	reqCtx, cancel := context.WithTimeout(reqCtx, 5*time.Second)
+	reqCtx, cancel := context.WithTimeout(reqCtx, utils.TIMEOUT)
 	defer cancel()
 
 	balance, err := c.service.GetAccountBalance(reqCtx, idNumber)
@@ -77,7 +77,7 @@ func (c *AccountController) GetAccountBalance(ctx *gin.Context) {
 
 func (c *AccountController) GetAllAccounts(ctx *gin.Context) {
 	reqCtx := ctx.Request.Context()
-	reqCtx, cancel := context.WithTimeout(reqCtx, 5*time.Second)
+	reqCtx, cancel := context.WithTimeout(reqCtx, utils.TIMEOUT)
 	defer cancel()
 
 	accounts, err := c.service.GetAllAccounts(reqCtx)
@@ -89,6 +89,22 @@ func (c *AccountController) GetAllAccounts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, accounts)
 }
 
+func (c *AccountController) GetAccountTransactions(ctx *gin.Context) {
+	idNumber := ctx.Param("id_number")
+
+	reqCtx := ctx.Request.Context()
+	reqCtx, cancel := context.WithTimeout(reqCtx, utils.TIMEOUT_STREAM)
+	defer cancel()
+
+	transactions, err := c.service.GetAccountTransactions(reqCtx, idNumber)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, transactions)
+}
+
 func (c *AccountController) RegisterRoutes(router *gin.Engine) {
 	group := router.Group("/accounts")
 	{
@@ -96,5 +112,6 @@ func (c *AccountController) RegisterRoutes(router *gin.Engine) {
 		group.GET("/:id_number", c.GetAccountByAccountNumber)
 		group.GET("/:id_number/balance", c.GetAccountBalance)
 		group.GET("", c.GetAllAccounts)
+		group.GET("/:id_number/transactions", c.GetAccountTransactions)
 	}
 }

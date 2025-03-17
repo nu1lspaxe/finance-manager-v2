@@ -33,6 +33,11 @@ INSERT INTO "BK_Account" (user_id, id_number)
 VALUES ($1, generate_account_number())
 RETURNING *;
 
+-- name: CheckAccountIDNumberExists :one
+SELECT EXISTS (
+  SELECT 1 FROM "BK_Account" WHERE id_number = $1
+) AS id_number_exists;
+
 -- name: GetAccountByIDNumber :one
 SELECT id, user_id, balance, created_at, updated_at
 FROM "BK_Account"

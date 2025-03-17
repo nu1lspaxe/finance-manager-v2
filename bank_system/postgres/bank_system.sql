@@ -53,7 +53,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Get account transactions by ID number
-CREATE OR REPLACE FUNCTION get_account_transactions_by_id_number(id_number VARCHAR)
+CREATE OR REPLACE FUNCTION get_account_transactions_by_id_number(p_id_number VARCHAR(20))
 RETURNS TABLE (
     id BIGINT,
     amount NUMERIC(20,2),
@@ -66,7 +66,7 @@ BEGIN
     SELECT t.id, t.amount, t.tx_type, t.detail, t.created_at
     FROM "BK_Transaction" t
     JOIN "BK_Account" a ON t.account_id = a.id
-    WHERE a.id_number = id_number
+    WHERE a.id_number = p_id_number
     ORDER BY t.created_at DESC;
 END;
 $$ LANGUAGE plpgsql;

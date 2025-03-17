@@ -11,7 +11,9 @@ import (
 
 type AccountRepository interface {
 	CreateAccount(ctx context.Context, userID int64) (sqlc.BKAccount, error)
+	CheckAccountIDNumberExists(ctx context.Context, idNumber string) (bool, error)
 	GetAccountByIDNumber(ctx context.Context, idNumber string) (sqlc.GetAccountByIDNumberRow, error)
+	GetAccountTransactionsByIDNumber(ctx context.Context, idNumber string) ([]sqlc.GetAccountTransactionsByIDNumberRow, error)
 	GetAllAccounts(ctx context.Context) ([]sqlc.GetAllAccountsRow, error)
 	WithdrawFromAccount(ctx context.Context, accountID int64, amount float64, detail string, txRepo transaction.TxRepository) (float64, error)
 	DepositToAccount(ctx context.Context, accountID int64, amount float64, detail string, txRepo transaction.TxRepository) (float64, error)
@@ -37,8 +39,24 @@ func (r *accountRepositoryImpl) CreateAccount(ctx context.Context, userID int64)
 	return tx, nil
 }
 
-func (r *accountRepositoryImpl) GetAccountByIDNumber(ctx context.Context, idNumber string) (sqlc.GetAccountByIDNumberRow, error) {
+func (r *accountRepositoryImpl) CheckAccountIDNumberExists(ctx context.Context, idNumber string) (bool, error) {
+	exists, err := r.queries.CheckAccountIDNumberExists(ctx, idNumber)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
+func (r *accountRepositoryImpl) GetAccountByIDNumber(
+	ctx context.Context, idNumber string,
+) (sqlc.GetAccountByIDNumberRow, error) {
 	return r.queries.GetAccountByIDNumber(ctx, idNumber)
+}
+
+func (r *accountRepositoryImpl) GetAccountTransactionsByIDNumber(
+	ctx context.Context, idNumber string,
+) ([]sqlc.GetAccountTransactionsByIDNumberRow, error) {
+	return r.queries.GetAccountTransactionsByIDNumber(ctx, idNumber)
 }
 
 func (r *accountRepositoryImpl) GetAllAccounts(ctx context.Context) ([]sqlc.GetAllAccountsRow, error) {
