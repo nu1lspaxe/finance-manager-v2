@@ -1,8 +1,11 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "postgres/bank_system_query.sql"
     schema: "postgres/bank_system.sql"
+    queries: "postgres/bank_system_query.sql"
+    strict_function_checks: true
+    database:
+      uri: ${POSTGRES_URI}
     gen:
       go:
         package: "sqlc"
@@ -14,6 +17,8 @@ sql:
         overrides:
           # https://github.com/kyleconroy/sqlc/blob/main/internal/codegen/golang/postgresql_type.go#L94
           - db_type: "pg_catalog.numeric"
+            go_type: "float64"
+          - db_type: "numeric"
             go_type: "float64"
           - db_type: "bigint"
             go_type: "int64"

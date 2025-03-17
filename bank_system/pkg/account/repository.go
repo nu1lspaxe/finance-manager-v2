@@ -12,7 +12,6 @@ import (
 type AccountRepository interface {
 	CreateAccount(ctx context.Context, userID int64) (sqlc.BKAccount, error)
 	GetAccountByIDNumber(ctx context.Context, idNumber string) (sqlc.GetAccountByIDNumberRow, error)
-	GetAccountTransactions(ctx context.Context, accountID int64) ([]sqlc.GetAccountTransactionsRow, error)
 	GetAllAccounts(ctx context.Context) ([]sqlc.GetAllAccountsRow, error)
 	WithdrawFromAccount(ctx context.Context, accountID int64, amount float64, detail string, txRepo transaction.TxRepository) (float64, error)
 	DepositToAccount(ctx context.Context, accountID int64, amount float64, detail string, txRepo transaction.TxRepository) (float64, error)
@@ -42,10 +41,6 @@ func (r *accountRepositoryImpl) GetAccountByIDNumber(ctx context.Context, idNumb
 	return r.queries.GetAccountByIDNumber(ctx, idNumber)
 }
 
-func (r *accountRepositoryImpl) GetAccountTransactions(ctx context.Context, accountID int64) ([]sqlc.GetAccountTransactionsRow, error) {
-	return r.queries.GetAccountTransactions(ctx, accountID)
-}
-
 func (r *accountRepositoryImpl) GetAllAccounts(ctx context.Context) ([]sqlc.GetAllAccountsRow, error) {
 	accounts, err := r.queries.GetAllAccounts(ctx)
 	if err != nil {
@@ -71,8 +66,9 @@ func (r *accountRepositoryImpl) WithdrawFromAccount(
 	defer tx.Rollback(ctx)
 
 	balanceAfter, err := r.queries.WithTx(tx).WithdrawFromAccount(ctx, sqlc.WithdrawFromAccountParams{
-		ID:      accountID,
-		Balance: amount})
+		AccountID: accountID,
+		Amount:    amount,
+	})
 
 	if err != nil {
 		return 0, err
@@ -107,8 +103,9 @@ func (r *accountRepositoryImpl) DepositToAccount(
 	defer tx.Rollback(ctx)
 
 	balanceAfter, err := r.queries.WithTx(tx).DepositToAccount(ctx, sqlc.DepositToAccountParams{
-		ID:      accountID,
-		Balance: amount})
+		AccountID: accountID,
+		Amount:    amount,
+	})
 
 	if err != nil {
 		return 0, err

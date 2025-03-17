@@ -43,6 +43,8 @@ func (s *AccountService) GetAccountBalance(ctx context.Context, idNumber string)
 	return account.Balance, nil
 }
 
+// func (s *AccountService) GetAccountTransactions
+
 func (s *AccountService) GetAllAccounts(ctx context.Context) (*[]sqlc.GetAllAccountsRow, error) {
 	accounts, err := s.actRepo.GetAllAccounts(ctx)
 	if err != nil {
