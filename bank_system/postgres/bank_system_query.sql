@@ -49,8 +49,11 @@ FROM "BK_Account"
 WHERE id = $1;
 
 -- name: GetAccountTransactionsByIDNumber :many
-SELECT id, amount, tx_type, detail, created_at
-FROM get_account_transactions_by_id_number($1);
+SELECT t.id, t.amount, t.tx_type, t.detail, t.created_at
+FROM "BK_Transaction" t
+JOIN "BK_Account" a ON t.account_id = a.id
+WHERE a.id_number = $1
+ORDER BY t.created_at DESC;
 
 -- name: GetAllAccounts :many
 SELECT id, id_number, user_id
@@ -60,10 +63,14 @@ FROM "BK_Account";
 -- Withdraws the specified amount from the account balance.
 -- $1: account ID
 -- $2: amount to withdraw
-SELECT withdraw_from_account($1, $2) AS balance;
+-- $3: Transaction detail
+SELECT new_balance::NUMERIC, transaction_id::BIGINT FROM withdraw_from_account($1, $2, $3);
 
 -- name: DepositToAccount :one
-SELECT deposit_to_account($1, $2) AS balance;
+-- $1: account ID
+-- $2: amount to deposit
+-- $3: Transaction detail
+SELECT new_balance::NUMERIC, transaction_id::BIGINT FROM deposit_to_account($1, $2, $3);
 
 -- name: CreateTransaction :one
 INSERT INTO "BK_Transaction" (

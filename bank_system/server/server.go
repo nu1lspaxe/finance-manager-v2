@@ -42,7 +42,7 @@ func NewServer() (*Server, error) {
 	txController := transaction.NewTxController(txService, logger)
 
 	actRepo := account.NewAccountRepository(pool)
-	actService := account.NewAccountService(actRepo, txRepo)
+	actService := account.NewAccountService(actRepo)
 	actController := account.NewAccountController(actService, logger)
 
 	cronService, err := NewCronService(pool, logger)

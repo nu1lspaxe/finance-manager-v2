@@ -36,7 +36,7 @@ func NewCronService(pool *pgxpool.Pool, logger *log.Logger) (*CronService, error
 	txService := transaction.NewTxService(txRepo)
 
 	actRepo := account.NewAccountRepository(pool)
-	actService := account.NewAccountService(actRepo, txRepo)
+	actService := account.NewAccountService(actRepo)
 
 	return &CronService{
 		scheduler:  s,
@@ -77,13 +77,16 @@ func (c *CronService) Start() error {
 					return
 				}
 
-				balance, err := c.actService.Deposit(ctx, account.ID, float64(rInt), "")
+				txId, balance, err := c.actService.Deposit(ctx, account.ID, float64(rInt), "")
 				if err != nil {
 					logger.Printf("cronjob 1 - create transaction failed: %v\n", err)
 					return
 				}
 
-				logger.Printf("cronjob 1 - deposited %f from account %d, new balance: %f\n", float64(rInt), account.ID, balance)
+				logger.Printf(
+					"cronjob 1 - deposited %f from account %d (tx_id: %d), new balance: %f\n",
+					float64(rInt), account.ID, txId, balance,
+				)
 			},
 			c.logger,
 		),
@@ -116,13 +119,16 @@ func (c *CronService) Start() error {
 						return
 					}
 
-					balance, err := c.actService.Deposit(ctx, account.ID, float64(rInt), "")
+					txId, balance, err := c.actService.Deposit(ctx, account.ID, float64(rInt), "")
 					if err != nil {
 						logger.Printf("cronjob 2 - create transaction failed: %v\n", err)
 						return
 					}
 
-					logger.Printf("cronjob 2 - deposited %f to account %d, new balance: %f\n", float64(rInt), account.ID, balance)
+					logger.Printf(
+						"cronjob 2 - deposited %f to account %d (tx_id: %d), new balance: %f\n",
+						float64(rInt), account.ID, txId, balance,
+					)
 				}
 			},
 			c.logger,
@@ -140,7 +146,7 @@ func (c *CronService) Start() error {
 		),
 		gocron.NewTask(
 			func(logger *log.Logger) {
-				rInt := r.Uint32()
+				rInt := r.Intn(1000000)
 
 				accounts, err := c.actService.GetAllAccounts(context.Background())
 				if err != nil {
@@ -148,14 +154,17 @@ func (c *CronService) Start() error {
 					return
 				}
 
-				for _, account := range *accounts {
-					balance, err := c.actService.Withdraw(context.Background(), account.IDNumber, float64(rInt), "")
+				for _, account := range accounts {
+					txId, balance, err := c.actService.Withdraw(context.Background(), account.IDNumber, float64(rInt), "")
 					if err != nil {
 						logger.Printf("cronjob 3 - create transaction failed: %v\n", err)
 						return
 					}
 
-					logger.Printf("cronjob 3 - withdraw %f from account %d, new balance: %f\n", float64(rInt), account.ID, balance)
+					logger.Printf(
+						"cronjob 3 - withdraw %f from account %d (tx_id: %d), new balance: %f\n",
+						float64(rInt), account.ID, txId, balance,
+					)
 				}
 			},
 			c.logger,

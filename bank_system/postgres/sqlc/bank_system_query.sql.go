@@ -125,19 +125,28 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (BKUser,
 }
 
 const depositToAccount = `-- name: DepositToAccount :one
-SELECT deposit_to_account($1, $2) AS balance
+SELECT new_balance::NUMERIC, transaction_id::BIGINT FROM deposit_to_account($1, $2, $3)
 `
 
 type DepositToAccountParams struct {
 	AccountID int64   `json:"account_id"`
 	Amount    float64 `json:"amount"`
+	TxDetail  string  `json:"tx_detail"`
 }
 
-func (q *Queries) DepositToAccount(ctx context.Context, arg DepositToAccountParams) (float64, error) {
-	row := q.db.QueryRow(ctx, depositToAccount, arg.AccountID, arg.Amount)
-	var balance float64
-	err := row.Scan(&balance)
-	return balance, err
+type DepositToAccountRow struct {
+	NewBalance    float64 `json:"new_balance"`
+	TransactionID int64   `json:"transaction_id"`
+}
+
+// $1: account ID
+// $2: amount to deposit
+// $3: Transaction detail
+func (q *Queries) DepositToAccount(ctx context.Context, arg DepositToAccountParams) (DepositToAccountRow, error) {
+	row := q.db.QueryRow(ctx, depositToAccount, arg.AccountID, arg.Amount, arg.TxDetail)
+	var i DepositToAccountRow
+	err := row.Scan(&i.NewBalance, &i.TransactionID)
+	return i, err
 }
 
 const getAccountBalance = `-- name: GetAccountBalance :one
@@ -181,13 +190,16 @@ func (q *Queries) GetAccountByIDNumber(ctx context.Context, idNumber string) (Ge
 }
 
 const getAccountTransactionsByIDNumber = `-- name: GetAccountTransactionsByIDNumber :many
-SELECT id, amount, tx_type, detail, created_at
-FROM get_account_transactions_by_id_number($1)
+SELECT t.id, t.amount, t.tx_type, t.detail, t.created_at
+FROM "BK_Transaction" t
+JOIN "BK_Account" a ON t.account_id = a.id
+WHERE a.id_number = $1
+ORDER BY t.created_at DESC
 `
 
 type GetAccountTransactionsByIDNumberRow struct {
-	ID        pgtype.Int8        `json:"id"`
-	Amount    pgtype.Numeric     `json:"amount"`
+	ID        int64              `json:"id"`
+	Amount    float64            `json:"amount"`
 	TxType    string             `json:"tx_type"`
 	Detail    string             `json:"detail"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
@@ -392,20 +404,27 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (BKUser,
 }
 
 const withdrawFromAccount = `-- name: WithdrawFromAccount :one
-SELECT withdraw_from_account($1, $2) AS balance
+SELECT new_balance::NUMERIC, transaction_id::BIGINT FROM withdraw_from_account($1, $2, $3)
 `
 
 type WithdrawFromAccountParams struct {
 	AccountID int64   `json:"account_id"`
 	Amount    float64 `json:"amount"`
+	TxDetail  string  `json:"tx_detail"`
+}
+
+type WithdrawFromAccountRow struct {
+	NewBalance    float64 `json:"new_balance"`
+	TransactionID int64   `json:"transaction_id"`
 }
 
 // Withdraws the specified amount from the account balance.
 // $1: account ID
 // $2: amount to withdraw
-func (q *Queries) WithdrawFromAccount(ctx context.Context, arg WithdrawFromAccountParams) (float64, error) {
-	row := q.db.QueryRow(ctx, withdrawFromAccount, arg.AccountID, arg.Amount)
-	var balance float64
-	err := row.Scan(&balance)
-	return balance, err
+// $3: Transaction detail
+func (q *Queries) WithdrawFromAccount(ctx context.Context, arg WithdrawFromAccountParams) (WithdrawFromAccountRow, error) {
+	row := q.db.QueryRow(ctx, withdrawFromAccount, arg.AccountID, arg.Amount, arg.TxDetail)
+	var i WithdrawFromAccountRow
+	err := row.Scan(&i.NewBalance, &i.TransactionID)
+	return i, err
 }

@@ -52,72 +52,70 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Get account transactions by ID number
-CREATE OR REPLACE FUNCTION get_account_transactions_by_id_number(p_id_number VARCHAR(20))
-RETURNS TABLE (
-    id BIGINT,
-    amount NUMERIC(20,2),
-    tx_type TEXT,
-    detail TEXT,
-    created_at TIMESTAMPTZ
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT t.id, t.amount, t.tx_type, t.detail, t.created_at
-    FROM "BK_Transaction" t
-    JOIN "BK_Account" a ON t.account_id = a.id
-    WHERE a.id_number = p_id_number
-    ORDER BY t.created_at DESC;
-END;
-$$ LANGUAGE plpgsql;
-
 -- Withdraw from account
-CREATE OR REPLACE FUNCTION withdraw_from_account(account_id BIGINT, amount NUMERIC(20,2))
-RETURNS NUMERIC(100,2) AS $$
+CREATE OR REPLACE FUNCTION withdraw_from_account(account_id BIGINT, amount NUMERIC(20,2), tx_detail TEXT)
+RETURNS TABLE (
+    new_balance NUMERIC(100, 2),
+    transaction_id BIGINT
+) AS $$
 DECLARE
-    current_balance NUMERIC(100,2);
+    tx_id BIGINT;
 BEGIN
-    -- Lock the row to prevent race conditions
-    SELECT balance INTO current_balance
-    FROM "BK_Account"
-    WHERE id = account_id
-    FOR UPDATE;
-
-    -- Check if balance is sufficient
-    IF current_balance < amount THEN
-        RAISE EXCEPTION 'Insufficient balance. Available: %, Requested: %', current_balance, amount
-            USING ERRCODE = 'P0001';
+    IF amount <= 0 THEN
+        RAISE EXCEPTION 'Amount must be positive, got %', amount USING ERRCODE = 'P0001';
     END IF;
 
-    -- Update balance
     UPDATE "BK_Account"
-    SET balance = balance - amount, updated_at = NOW()
-    WHERE id = account_id
-    RETURNING balance INTO current_balance;
+    SET balance = balance - amount,
+        updated_at = NOW()
+    WHERE id = account_id AND balance >= amount
+    RETURNING balance INTO new_balance;
 
-    RETURN current_balance;
+    IF NOT FOUND THEN
+        PERFORM 1 FROM "BK_Account" WHERE id = account_id;
+        IF FOUND THEN
+            RAISE EXCEPTION 'Insufficient balance for account %', account_id USING ERRCODE = 'P0001';
+        ELSE
+            RAISE EXCEPTION 'Account % not found', account_id USING ERRCODE = 'P0001';
+        END IF;
+    END IF;
+
+    INSERT INTO "BK_Transaction" (account_id, amount, balance_after, tx_type, detail)
+    VALUES (account_id, amount, new_balance, 'WITHDRAW', tx_detail)
+    RETURNING id INTO tx_id;
+
+    RETURN QUERY SELECT new_balance, tx_id;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Deposit to account
-CREATE OR REPLACE FUNCTION deposit_to_account(account_id BIGINT, amount NUMERIC(20, 2))
-RETURNS NUMERIC(100, 2) AS $$
+CREATE OR REPLACE FUNCTION deposit_to_account(account_id BIGINT, amount NUMERIC(20, 2), tx_detail TEXT)
+RETURNS TABLE (
+    new_balance NUMERIC(100, 2),
+    transaction_id BIGINT
+) AS $$
 DECLARE
-    current_balance NUMERIC(100, 2);
+    new_balance NUMERIC(100, 2);
+    tx_id BIGINT;
 BEGIN
-    -- Lock the row to prevent race conditions
-    SELECT balance INTO current_balance
-    FROM "BK_Account"
-    WHERE id = account_id
-    FOR UPDATE;
+    IF amount <= 0 THEN
+        RAISE EXCEPTION 'Amount must be positive, got %', amount USING ERRCODE = 'P0001';
+    END IF;
 
-    -- Update the account balance
     UPDATE "BK_Account"
-    SET balance = balance + amount, updated_at = NOW()
+    SET balance = balance + amount,
+        updated_at = NOW()
     WHERE id = account_id
-    RETURNING balance INTO current_balance;
+    RETURNING balance INTO new_balance;
 
-    -- Return the new balance
-    RETURN current_balance;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Account % not found', account_id USING ERRCODE = 'P0001';
+    END IF;
+
+    INSERT INTO "BK_Transaction" (account_id, amount, balance_after, tx_type, detail)
+    VALUES (account_id, amount, new_balance, 'DEPOSIT', tx_detail)
+    RETURNING id INTO tx_id;
+
+    RETURN QUERY SELECT new_balance, tx_id;
 END;
 $$ LANGUAGE plpgsql;

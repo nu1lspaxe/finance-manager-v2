@@ -1,7 +1,6 @@
 package account
 
 import (
-	"bank_system/pkg/transaction"
 	"bank_system/postgres/sqlc"
 	"context"
 
@@ -15,8 +14,8 @@ type AccountRepository interface {
 	GetAccountByIDNumber(ctx context.Context, idNumber string) (sqlc.GetAccountByIDNumberRow, error)
 	GetAccountTransactionsByIDNumber(ctx context.Context, idNumber string) ([]sqlc.GetAccountTransactionsByIDNumberRow, error)
 	GetAllAccounts(ctx context.Context) ([]sqlc.GetAllAccountsRow, error)
-	WithdrawFromAccount(ctx context.Context, accountID int64, amount float64, detail string, txRepo transaction.TxRepository) (float64, error)
-	DepositToAccount(ctx context.Context, accountID int64, amount float64, detail string, txRepo transaction.TxRepository) (float64, error)
+	WithdrawFromAccount(ctx context.Context, accountID int64, amount float64, detail string) (int64, float64, error)
+	DepositToAccount(ctx context.Context, accountID int64, amount float64, detail string) (int64, float64, error)
 }
 
 type accountRepositoryImpl struct {
@@ -68,8 +67,8 @@ func (r *accountRepositoryImpl) GetAllAccounts(ctx context.Context) ([]sqlc.GetA
 }
 
 func (r *accountRepositoryImpl) WithdrawFromAccount(
-	ctx context.Context, accountID int64, amount float64, detail string, txRepo transaction.TxRepository,
-) (float64, error) {
+	ctx context.Context, accountID int64, amount float64, detail string,
+) (int64, float64, error) {
 	txOptions := pgx.TxOptions{
 		IsoLevel:       pgx.Serializable,
 		AccessMode:     pgx.ReadWrite,
@@ -79,34 +78,30 @@ func (r *accountRepositoryImpl) WithdrawFromAccount(
 	tx, err := r.pool.BeginTx(ctx, txOptions)
 
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	defer tx.Rollback(ctx)
 
-	balanceAfter, err := r.queries.WithTx(tx).WithdrawFromAccount(ctx, sqlc.WithdrawFromAccountParams{
+	result, err := r.queries.WithTx(tx).WithdrawFromAccount(ctx, sqlc.WithdrawFromAccountParams{
 		AccountID: accountID,
 		Amount:    amount,
+		TxDetail:  detail,
 	})
 
 	if err != nil {
-		return 0, err
-	}
-
-	_, err = txRepo.CreateTransaction(ctx, accountID, amount, transaction.TxType_WITHDRAW, "")
-	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
 	if err = tx.Commit(ctx); err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
-	return balanceAfter, nil
+	return result.TransactionID, result.NewBalance, nil
 }
 
 func (r *accountRepositoryImpl) DepositToAccount(
-	ctx context.Context, accountID int64, amount float64, detail string, txRepo transaction.TxRepository,
-) (float64, error) {
+	ctx context.Context, accountID int64, amount float64, detail string,
+) (int64, float64, error) {
 	txOptions := pgx.TxOptions{
 		IsoLevel:       pgx.Serializable,
 		AccessMode:     pgx.ReadWrite,
@@ -116,27 +111,23 @@ func (r *accountRepositoryImpl) DepositToAccount(
 	tx, err := r.pool.BeginTx(ctx, txOptions)
 
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	defer tx.Rollback(ctx)
 
-	balanceAfter, err := r.queries.WithTx(tx).DepositToAccount(ctx, sqlc.DepositToAccountParams{
+	result, err := r.queries.WithTx(tx).DepositToAccount(ctx, sqlc.DepositToAccountParams{
 		AccountID: accountID,
 		Amount:    amount,
+		TxDetail:  detail,
 	})
 
 	if err != nil {
-		return 0, err
-	}
-
-	_, err = txRepo.CreateTransaction(ctx, accountID, amount, transaction.TxType_DEPOSIT, detail)
-	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
 	if err = tx.Commit(ctx); err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
-	return balanceAfter, nil
+	return result.TransactionID, result.NewBalance, nil
 }

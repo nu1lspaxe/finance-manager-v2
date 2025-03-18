@@ -4,8 +4,6 @@ sql:
     schema: "postgres/bank_system.sql"
     queries: "postgres/bank_system_query.sql"
     strict_function_checks: true
-    database:
-      uri: ${POSTGRES_URI}
     gen:
       go:
         package: "sqlc"
