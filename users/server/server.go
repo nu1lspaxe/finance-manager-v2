@@ -52,9 +52,11 @@ func NewServer() (*Server, error) {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
 
+	kafkaAddr := viper.GetString("kafka.addr")
+	kafkaTopic := viper.GetString("kafka.topic")
 	kafkaWriter := &kafka.Writer{
-		Addr:     kafka.TCP("kafka:9092"),
-		Topic:    "bank-accounts",
+		Addr:     kafka.TCP(kafkaAddr),
+		Topic:    kafkaTopic,
 		Balancer: &kafka.LeastBytes{},
 	}
 

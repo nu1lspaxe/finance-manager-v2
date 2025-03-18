@@ -19,7 +19,9 @@ type UserService struct {
 	kafkaWriter *kafka.Writer
 }
 
-func NewUserService(repo UserRepository, tlsConfig *tls.Config, kafkaWriter *kafka.Writer) *UserService {
+func NewUserService(
+	repo UserRepository, tlsConfig *tls.Config, kafkaWriter *kafka.Writer,
+) *UserService {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig:   tlsConfig,
@@ -137,6 +139,14 @@ func getAccountBalance(ctx context.Context, client *http.Client, idNumber string
 		return 0, err
 	}
 	return balanceResp.Balance, nil
+}
+
+func (u *UserService) UpdateAccountBalance(ctx context.Context, accountId int64, idNumber string) error {
+	balance, err := getAccountBalance(ctx, u.httpClient, idNumber)
+	if err != nil {
+		return err
+	}
+	return u.repo.UpdateAccountBalance(ctx, accountId, balance)
 }
 
 func (u *UserService) GetUserAccounts(ctx context.Context, userId int64) (*[]sqlc.FMAccount, error) {
