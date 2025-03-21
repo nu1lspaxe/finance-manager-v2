@@ -8,7 +8,7 @@ until psql -U postgres -c '\l'; do
   sleep 2
 done
 
-DATABASES="bank_system fm_user fm_record"
+DATABASES="bank_system fm_user fm_record fm_record_bank"
 
 for db in $DATABASES; do
   echo "Creating database: $db"

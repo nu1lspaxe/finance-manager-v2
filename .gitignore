@@ -28,3 +28,5 @@ go.work.sum
 
 # CA setup
 */certs/*
+
+.vscode/*
