@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package records_bank;
+
+option go_package = "finance_manager/proto/records_bank;proto";
+
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service BankRecordService {
+
+    rpc GetBankRecord (GetBankRecordRequest) returns (BankRecordResponse) {
+        option (google.api.http) = {
+            get: "/v1/bank_records/{id}"
+        };
+    }
+
+    // /v1/bank_records/user?user_id&account_number&record_type&start_time&end_time
+    rpc GetUserBankRecordsWithFilters (GetUserBankRecordsWithFiltersRequest) returns (stream BankRecordResponse) {
+        option (google.api.http) = {
+            get: "/v1/bank_records/user"
+        };
+    }
+}
+
+enum BankRecordType {
+    INCOME = 0;
+    EXPENSE = 1;
+}
+
+message BankRecord {
+    int64 id = 1;
+    int64 user_id = 2;
+    double amount = 3;
+    int64 transaction_date = 4;
+    BankRecordType record_type = 5;
+    string detail = 6;
+    int64 created_at = 7;
+}
+
+message GetBankRecordRequest {
+    int64 id = 1;
+}
+
+message GetUserBankRecordsWithFiltersRequest {
+    int64 user_id = 1;
+    string account_number = 2 [(buf.validate.field).string.min_len = 20, (buf.validate.field).string.max_len = 20];
+    BankRecordType record_type = 3 [(buf.validate.field).enum.defined_only = true];
+    int64 start_time = 4;
+    int64 end_time = 5;
+}
+
+message BankRecordResponse {
+    BankRecord record = 1;
+}
