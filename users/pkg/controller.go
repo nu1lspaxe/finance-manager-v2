@@ -91,11 +91,11 @@ func (c *UserController) AddUserAccount(ctx context.Context, req *proto.UserAcco
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	err := c.service.AddAccount(ctx, req.Id, req.IdNumber)
+	balance, err := c.service.AddAccount(ctx, req.Id, req.IdNumber)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.UserAccountResponse{Success: true}, nil
+	return &proto.UserAccountResponse{Success: true, Balance: balance}, nil
 }
 
 func (c *UserController) GetUserAccounts(ctx context.Context, req *proto.GetUserAccountsRequest) (*proto.GetUserAccountsResponse, error) {

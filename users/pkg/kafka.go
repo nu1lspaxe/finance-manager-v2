@@ -15,7 +15,8 @@ func (s *UserService) publishMessage(ctx context.Context, key, value []byte) err
 		Value: value,
 	}
 
-	err := s.kafkaWriter.WriteMessages(ctx, msg)
+	err := s.KafkaWriter.WriteMessages(ctx, msg)
+
 	if err != nil {
 		return err
 	}
@@ -28,42 +29,44 @@ func (s *UserService) UpdateAccountBalanceJob(ctx context.Context) error {
 		return err
 	}
 
-	var mux sync.Mutex
 	var wg sync.WaitGroup
-	var errors []string
+	var errChan = make(chan error, len(userIds))
 
 	for _, userId := range userIds {
 		wg.Add(1)
-		go func(userId int64) {
+		go func(userId int64, ctx context.Context) {
+			defer wg.Done()
+
 			accounts, err := s.repo.GetUserAccounts(ctx, userId)
 			if err != nil {
-				mux.Lock()
-				errors = append(errors, err.Error())
-				mux.Unlock()
+				errChan <- err
 				return
 			}
 			for _, account := range accounts {
-				err := s.UpdateAccountBalance(ctx, userId, account.IDNumber)
+				err := s.UpdateAccountBalance(ctx, account.ID, account.IDNumber)
 				if err != nil {
-					mux.Lock()
-					errors = append(errors, err.Error())
-					mux.Unlock()
+					errChan <- err
 				}
-				err = s.publishMessage(
-					ctx,
-					[]byte(fmt.Append([]byte{}, userId)),
-					[]byte(account.IDNumber),
-				)
+
+				err = s.publishMessage(ctx, []byte(fmt.Append([]byte{}, userId)), []byte(account.IDNumber))
 				if err != nil {
-					mux.Lock()
-					errors = append(errors, err.Error())
-					mux.Unlock()
+					errChan <- err
 				}
 			}
-		}(userId)
+		}(userId, ctx)
 	}
 
-	wg.Wait()
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+
+	var errors []string
+	for err := range errChan {
+		if err != nil {
+			errors = append(errors, err.Error())
+		}
+	}
 
 	if len(errors) > 0 {
 		return utils.NewUserError(utils.ErrUpdateAccountBalance, errors...)

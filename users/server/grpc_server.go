@@ -3,6 +3,7 @@ package server
 import (
 	"crypto/tls"
 	"net"
+	"users/utils"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"go.uber.org/zap"
@@ -30,6 +31,7 @@ func NewGrpcServer(tlsConfig *tls.Config, logger *zap.Logger) *GrpcServer {
 			logging.StreamServerInterceptor(InterceptorLogger(logger), opts...),
 		),
 		grpc.Creds(creds),
+		grpc.ConnectionTimeout(utils.TIMEOUT),
 	)
 
 	reflection.Register(server)

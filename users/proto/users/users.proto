@@ -203,6 +203,7 @@ message UserAccountRequest {
 
 message UserAccountResponse {
     bool success = 1;
+    double balance = 2;
 }
 
 message GetUserAccountsRequest {

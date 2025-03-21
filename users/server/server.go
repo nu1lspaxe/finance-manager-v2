@@ -55,9 +55,11 @@ func NewServer() (*Server, error) {
 	kafkaAddr := viper.GetString("kafka.addr")
 	kafkaTopic := viper.GetString("kafka.topic")
 	kafkaWriter := &kafka.Writer{
-		Addr:     kafka.TCP(kafkaAddr),
-		Topic:    kafkaTopic,
-		Balancer: &kafka.LeastBytes{},
+		Addr:                   kafka.TCP(kafkaAddr),
+		Topic:                  kafkaTopic,
+		Balancer:               &kafka.LeastBytes{},
+		WriteTimeout:           utils.TIMEOUT,
+		AllowAutoTopicCreation: true,
 	}
 
 	repo := pkg.NewUserRepository(pool)
@@ -83,10 +85,10 @@ func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	errGroup, ctx := errgroup.WithContext(ctx)
+	errGroup, errCtx := errgroup.WithContext(ctx)
 
 	errGroup.Go(func() error {
-		s.StartCronJob(ctx)
+		s.StartCronJob(errCtx)
 		return nil
 	})
 
@@ -110,15 +112,19 @@ func (s *Server) Run() error {
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	select {
-	case <-ctx.Done():
+	case <-errCtx.Done():
 	case <-quit:
 		cancel()
 	}
 
-	s.Shutdown(ctx)
+	s.logger.Info("server is shutting down...")
+	s.Shutdown(errCtx)
+
 	if err := errGroup.Wait(); err != nil && err != grpc.ErrServerStopped && err != http.ErrServerClosed {
 		return err
 	}
+
+	s.logger.Info("server shutdown successfully")
 	return nil
 }
 
@@ -129,5 +135,4 @@ func (s *Server) Shutdown(ctx context.Context) {
 	}
 	s.grpcServer.server.GracefulStop()
 	s.pool.Close()
-	s.logger.Info("server shutdown...")
 }

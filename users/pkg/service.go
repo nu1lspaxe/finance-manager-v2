@@ -16,7 +16,7 @@ import (
 type UserService struct {
 	repo        UserRepository
 	httpClient  *http.Client
-	kafkaWriter *kafka.Writer
+	KafkaWriter *kafka.Writer
 }
 
 func NewUserService(
@@ -33,7 +33,7 @@ func NewUserService(
 	return &UserService{
 		repo:        repo,
 		httpClient:  client,
-		kafkaWriter: kafkaWriter,
+		KafkaWriter: kafkaWriter,
 	}
 }
 
@@ -89,21 +89,21 @@ func (u *UserService) DeleteUser(ctx context.Context, userId int64) error {
 	return u.repo.DeleteUser(ctx, userId)
 }
 
-func (u *UserService) AddAccount(ctx context.Context, userId int64, idNumber string) error {
+func (u *UserService) AddAccount(ctx context.Context, userId int64, idNumber string) (float64, error) {
 	exists, err := u.repo.CheckAccountExists(ctx, userId, idNumber)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if exists {
-		return utils.NewUserError(utils.ErrAccountExists)
+		return 0, utils.NewUserError(utils.ErrAccountExists)
 	}
 
 	balance, err := getAccountBalance(ctx, u.httpClient, idNumber)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return u.repo.AddAccount(ctx, userId, idNumber, balance)
+	return balance, u.repo.AddAccount(ctx, userId, idNumber, balance)
 }
 
 func getAccountBalance(ctx context.Context, client *http.Client, idNumber string) (float64, error) {
