@@ -29,7 +29,7 @@ func (r *RecordService) GetRecord(ctx context.Context, id int64) (*sqlc.FMRecord
 	return record, nil
 }
 
-func (r *RecordService) GetUserRecordsWithFilters(ctx context.Context, userId int64, recordType string, startTime int64, endTime int64) (*[]sqlc.FMRecord, error) {
+func (r *RecordService) GetUserRecordsWithFilters(ctx context.Context, userId int64, recordType string, startTime int64, endTime int64) ([]sqlc.FMRecord, error) {
 
 	var records []sqlc.FMRecord
 	var err error
@@ -56,7 +56,7 @@ func (r *RecordService) GetUserRecordsWithFilters(ctx context.Context, userId in
 	if err != nil {
 		return nil, err
 	}
-	return &records, nil
+	return records, nil
 }
 
 func (r *RecordService) UpdateRecord(ctx context.Context, id int64, amount float32, transactionDate int64, recordType string, detail string) error {

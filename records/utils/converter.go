@@ -11,11 +11,12 @@ import (
 func SqlcToProto(record *sqlc.FMRecord) (*proto.Record, error) {
 
 	return &proto.Record{
-		Id:        record.ID,
-		UserId:    record.UserID,
-		Amount:    record.Amount,
-		CreatedAt: record.CreatedAt.Time.Unix(),
-		UpdatedAt: record.UpdatedAt.Time.Unix(),
+		Id:              record.ID,
+		UserId:          record.UserID,
+		Amount:          record.Amount,
+		TransactionDate: record.TransactionDate.Time.Unix(),
+		CreatedAt:       record.CreatedAt.Time.Unix(),
+		UpdatedAt:       record.UpdatedAt.Time.Unix(),
 	}, nil
 }
 

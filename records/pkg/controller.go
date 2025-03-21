@@ -69,7 +69,7 @@ func (r *RecordController) GetUserRecordsWithFilters(
 		return err
 	}
 
-	for _, record := range *records {
+	for _, record := range records {
 		protoRecord, err := utils.SqlcToProto(&record)
 		if err != nil {
 			return err

@@ -36,7 +36,6 @@ func NewRecordRepository(pool *pgxpool.Pool) RecordRepository {
 }
 
 func (r recordRepositoryImpl) CreateRecord(ctx context.Context, userId int64, amount float32, transactionDate int64, recordType string, detail string) (sqlc.FMRecord, error) {
-
 	txDate := utils.Int64ToPgDate(transactionDate)
 
 	record, err := r.queries.CreateRecord(ctx, sqlc.CreateRecordParams{

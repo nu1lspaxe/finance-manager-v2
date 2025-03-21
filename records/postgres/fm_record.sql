@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "FM_Record" (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    amount NUMERIC(9,2) NOT NULL,
+    amount NUMERIC(20,2) NOT NULL,
     transaction_date DATE NOT NULL,
     record_type TEXT NOT NULL,
     detail TEXT,
