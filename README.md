@@ -2,6 +2,17 @@
 
 Different from [finance-manager](https://github.com/nu1lspaxe/finance-manager), the finance-manager-v2 is designed with microservice pattern and combined the utilities with Kafka and gRPC.
 
+## CA Certificates
+The self-signed certificates are used in all services. For current (local-dev) version, we use all the same `cert.pem` and `key.pem` in `certs/` folder which placed in every services.
+
+We use `mkcert` to generate certificates, please follow the steps:
+```bash
+# 1. In WSL2, get WSL2 ip address by command `ip a`
+# 2. Find eth0 or other interface, it should contains `inet 172.XXX.XXX.XXX/20`
+# 3. Run the command in powershell, replace <wsl_ip_addr> with 172.XXX.XXX.XXX/20
+mkcert localhost 127.0.0.1 ::1 <wsl_ip_addr>
+```
+
 
 ## Bank System
 > Supporting protocols : HTTP/1.1
