@@ -27,6 +27,7 @@ services:
       - REPMGR_NODE_NETWORK_NAME=pg-0
     networks:
       - finance-manager-network
+      
   pg-1:
     image: bitnami/postgresql-repmgr:17.4.0
     container_name: pg-1
@@ -46,6 +47,7 @@ services:
       - REPMGR_NODE_NETWORK_NAME=pg-1
     networks:
       - finance-manager-network
+
   pgpool:
     image: bitnami/pgpool:4.5.5
     container_name: pgpool
@@ -84,6 +86,17 @@ services:
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
     networks:
       - finance-manager-network
+
+  redis:
+    image: redis:8.0-M04-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - finance-manager-network
   
   bank_system:
     build:
@@ -101,3 +114,4 @@ services:
 volumes:
   pg_0_data:
   pg_1_data:
+  redis_data:
