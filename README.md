@@ -13,6 +13,17 @@ We use `mkcert` to generate certificates, please follow the steps:
 mkcert localhost 127.0.0.1 ::1 <wsl_ip_addr>
 ```
 
+## gRPC CLI
+
+We use [Evans CLI](https://github.com/ktr0731/evans) for interacting with gRPC server.
+
+```bash
+evans -r repl -p <grpc_port> --tls --cacert certs/cert.pem
+
+$ show package 
+$ package <package_name>  # set package connection
+```
+
 
 ## Bank System
 > Supporting protocols : HTTP/1.1

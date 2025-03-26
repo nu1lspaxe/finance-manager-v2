@@ -19,11 +19,12 @@ type UserService struct {
 	repo        UserRepository
 	httpClient  *http.Client
 	KafkaWriter *kafka.Writer
+	jwtManager  *utils.JWTManager
 	redisClient *redis.Client
 }
 
 func NewUserService(
-	repo UserRepository, tlsConfig *tls.Config, kafkaWriter *kafka.Writer, redisClient *redis.Client,
+	repo UserRepository, tlsConfig *tls.Config, kafkaWriter *kafka.Writer, jwtManager *utils.JWTManager, redisClient *redis.Client,
 ) *UserService {
 	client := &http.Client{
 		Transport: &http.Transport{
@@ -37,6 +38,7 @@ func NewUserService(
 		repo:        repo,
 		httpClient:  client,
 		KafkaWriter: kafkaWriter,
+		jwtManager:  jwtManager,
 		redisClient: redisClient,
 	}
 }
@@ -52,7 +54,7 @@ func (u *UserService) Login(ctx context.Context, email, password string) (string
 	}
 
 	issueTime := time.Now()
-	tokenString, err := utils.GetJWTToken(user.ID, issueTime)
+	tokenString, err := u.jwtManager.Generate(user.ID, issueTime)
 	if err != nil {
 		return "", err
 	}
@@ -76,11 +78,11 @@ func (u *UserService) Login(ctx context.Context, email, password string) (string
 }
 
 func (u *UserService) Logout(ctx context.Context, userId int64, token string) error {
-	tokenUserId, err := utils.ParseJWTToken(token)
+	claims, err := u.jwtManager.Verify(token)
 	if err != nil {
 		return err
 	}
-	if tokenUserId != userId {
+	if claims.UserId != userId {
 		return utils.NewUserError(utils.ErrTokenInvalid)
 	}
 
