@@ -9,8 +9,10 @@ const (
 	ErrUserExists
 	ErrUserEmailExists
 	ErrUserInvalid
+	ErrPasswdInvalid
 	ErrAccountExists
 	ErrStatusCode
+	ErrTokenInvalid
 	ErrUpdateAccountBalance
 )
 
@@ -38,10 +40,14 @@ func GetErrorMessage(code int, opts ...string) string {
 		return fmt.Sprintf("email already exists: %v", opts)
 	case ErrUserInvalid:
 		return fmt.Sprintf("invalid user: %v", opts)
+	case ErrPasswdInvalid:
+		return fmt.Sprintf("invalid password: %v", opts)
 	case ErrAccountExists:
 		return fmt.Sprintf("account already exists: %v", opts)
 	case ErrStatusCode:
 		return fmt.Sprintf("status code error: %v", opts)
+	case ErrTokenInvalid:
+		return fmt.Sprintf("invalid token: %v", opts)
 	case ErrUpdateAccountBalance:
 		return fmt.Sprintf("failed to update account balance: %v", opts)
 	default:

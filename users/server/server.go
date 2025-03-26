@@ -27,7 +27,7 @@ type Server struct {
 	repository pkg.UserRepository
 	service    *pkg.UserService
 	controller *pkg.UserController
-	pool       *pgxpool.Pool
+	pgpool     *pgxpool.Pool
 }
 
 func NewServer() (*Server, error) {
@@ -46,10 +46,17 @@ func NewServer() (*Server, error) {
 	gateway := NewGatewayServer(tlsConfig, logger)
 
 	ctx := context.Background()
-	connStr := viper.GetString("postgres.connection_string")
-	pool, err := SetPGConn(ctx, connStr)
+
+	pgLink := viper.GetString("postgres.link")
+	pgpool, err := GetPgPool(ctx, pgLink)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
+	}
+
+	redisLink := viper.GetString("redis.link")
+	redisClient, err := GetRedisClient(ctx, redisLink)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to redis: %v", err)
 	}
 
 	kafkaAddr := viper.GetString("kafka.addr")
@@ -62,8 +69,8 @@ func NewServer() (*Server, error) {
 		AllowAutoTopicCreation: true,
 	}
 
-	repo := pkg.NewUserRepository(pool)
-	service := pkg.NewUserService(repo, tlsConfig, kafkaWriter)
+	repo := pkg.NewUserRepository(pgpool)
+	service := pkg.NewUserService(repo, tlsConfig, kafkaWriter, redisClient)
 	controller := pkg.NewUserController(service)
 
 	server := &Server{
@@ -73,7 +80,7 @@ func NewServer() (*Server, error) {
 		repository: repo,
 		service:    service,
 		controller: controller,
-		pool:       pool,
+		pgpool:     pgpool,
 	}
 
 	proto.RegisterUserServiceServer(grpcServer.server, controller)
@@ -134,5 +141,5 @@ func (s *Server) Shutdown(ctx context.Context) {
 		s.logger.Error("Failed to shutdown HTTP server:", zap.Error(err))
 	}
 	s.grpcServer.server.GracefulStop()
-	s.pool.Close()
+	s.pgpool.Close()
 }

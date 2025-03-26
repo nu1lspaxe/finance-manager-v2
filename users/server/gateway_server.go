@@ -19,7 +19,7 @@ type GatewayServer struct {
 }
 
 func NewGatewayServer(tlsConfig *tls.Config, logger *zap.Logger) *GatewayServer {
-	mux := runtime.NewServeMux()
+	mux := runtime.NewServeMux(runtime.WithMiddlewares())
 	mux.HandlePath("GET", "/openapiv2/*", openAPIServer("proto/openapiv2"))
 
 	return &GatewayServer{
@@ -34,6 +34,8 @@ func NewGatewayServer(tlsConfig *tls.Config, logger *zap.Logger) *GatewayServer 
 func (g *GatewayServer) Start(ctx context.Context, httpAddr string, grpcAddr string) error {
 	creds := credentials.NewTLS(g.server.TLSConfig)
 
+	g.server.Addr = fmt.Sprintf(":%s", httpAddr)
+
 	err := proto.RegisterUserServiceHandlerFromEndpoint(
 		ctx,
 		g.server.Handler.(*runtime.ServeMux),
@@ -43,8 +45,6 @@ func (g *GatewayServer) Start(ctx context.Context, httpAddr string, grpcAddr str
 	if err != nil {
 		return err
 	}
-
-	g.server.Addr = fmt.Sprintf(":%s", httpAddr)
 
 	return g.server.ListenAndServeTLS("", "")
 }

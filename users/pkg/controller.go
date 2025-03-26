@@ -17,6 +17,38 @@ func NewUserController(service *UserService) *UserController {
 	return &UserController{service: service}
 }
 
+func (c *UserController) Login(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {
+	err := protovalidate.Validate(req)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	token, err := c.service.Login(ctx, req.Email, req.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.LoginResponse{Token: token}, nil
+}
+
+func (c *UserController) Logout(ctx context.Context, req *proto.LogoutRequest) (*proto.LogoutResponse, error) {
+	err := protovalidate.Validate(req)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
+	defer cancel()
+
+	err = c.service.Logout(ctx, req.Id, req.Token)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.LogoutResponse{Success: true}, nil
+}
+
 func (c *UserController) CreateUser(ctx context.Context, req *proto.CreateUserRequest) (*proto.UserResponse, error) {
 	err := protovalidate.Validate(req)
 	if err != nil {

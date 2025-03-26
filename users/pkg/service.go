@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 	"users/postgres/sqlc"
 	"users/utils"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"
 	"github.com/spf13/viper"
 )
@@ -17,10 +19,11 @@ type UserService struct {
 	repo        UserRepository
 	httpClient  *http.Client
 	KafkaWriter *kafka.Writer
+	redisClient *redis.Client
 }
 
 func NewUserService(
-	repo UserRepository, tlsConfig *tls.Config, kafkaWriter *kafka.Writer,
+	repo UserRepository, tlsConfig *tls.Config, kafkaWriter *kafka.Writer, redisClient *redis.Client,
 ) *UserService {
 	client := &http.Client{
 		Transport: &http.Transport{
@@ -34,13 +37,63 @@ func NewUserService(
 		repo:        repo,
 		httpClient:  client,
 		KafkaWriter: kafkaWriter,
+		redisClient: redisClient,
 	}
 }
 
-func (u *UserService) CreateUser(ctx context.Context, username, email, password string) (*sqlc.FMUser, error) {
-	if username == "" || email == "" {
-		return nil, utils.NewUserError(utils.ErrUserInvalid, "username or email is empty")
+func (u *UserService) Login(ctx context.Context, email, password string) (string, error) {
+	user, err := u.repo.GetUserByEmail(ctx, email)
+	if err != nil {
+		return "", err
 	}
+
+	if !utils.CheckPasswordHash(password, user.Password) {
+		return "", utils.NewUserError(utils.ErrPasswdInvalid)
+	}
+
+	issueTime := time.Now()
+	tokenString, err := utils.GetJWTToken(user.ID, issueTime)
+	if err != nil {
+		return "", err
+	}
+
+	key := fmt.Sprintf("user:%d", user.ID)
+	expiryTime := time.Until(issueTime.Add(utils.TOKEN_EXPIRY))
+
+	err = u.redisClient.HSet(ctx, key, map[string]interface{}{
+		"token": tokenString,
+	}).Err()
+	if err != nil {
+		return "", err
+	}
+
+	err = u.redisClient.Expire(ctx, key, expiryTime).Err()
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func (u *UserService) Logout(ctx context.Context, userId int64, token string) error {
+	tokenUserId, err := utils.ParseJWTToken(token)
+	if err != nil {
+		return err
+	}
+	if tokenUserId != userId {
+		return utils.NewUserError(utils.ErrTokenInvalid)
+	}
+
+	key := fmt.Sprintf("user:%d", userId)
+	err = u.redisClient.HDel(ctx, key, token).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserService) CreateUser(ctx context.Context, username, email, password string) (*sqlc.FMUser, error) {
 	exists, err := u.repo.CheckUserEmailExists(ctx, email)
 	if err != nil {
 		return nil, err

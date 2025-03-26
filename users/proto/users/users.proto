@@ -55,18 +55,18 @@ service UserService {
 
     rpc UpdateUserAccountBalance(UserAccountRequest) returns (UserAccountResponse) {}
 
-    // rpc Login(LoginRequest) returns (LoginResponse) {
-    //     option (google.api.http) = {
-    //         post: "/v1/users/login"
-    //         body: "*"
-    //     };
-    // }
-    // rpc Logout(LogoutRequest) returns (LogoutResponse) {
-    //     option (google.api.http) = {
-    //         post: "/v1/users/logout"
-    //         body: "*"
-    //     };
-    // }
+    rpc Login(LoginRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/login"
+            body: "*"
+        };
+    }
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/logout"
+            body: "*"
+        };
+    }
 }
 
 message User {
@@ -93,34 +93,14 @@ message CreateUserRequest {
     string password = 4 [(buf.validate.field) = {
         cel: [
             {
-            id: "password_length",
-            message: "password must be between 12 and 20 characters",
-            expression: "size(this) >= 12 && size(this) <= 20"
+                id: "password_length",
+                message: "password must be between 12 and 20 characters",
+                expression: "size(this) >= 12 && size(this) <= 20"
             },
             {
-            id: "password_uppercase",
-            message: "password must contain at least one uppercase letter",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[A-Z][A-Za-z0-9!@#$%^&*()_+-=]*$')"
-            },
-            {
-            id: "password_lowercase",
-            message: "password must contain at least one lowercase letter",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[a-z][A-Za-z0-9!@#$%^&*()_+-=]*$')"
-            },
-            {
-            id: "password_number",
-            message: "password must contain at least one number",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[0-9][A-Za-z0-9!@#$%^&*()_+-=]*$')"
-            },
-            {
-            id: "password_special",
-            message: "password must contain at least one special character",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[!@#$%^&*()_+-=][A-Za-z0-9!@#$%^&*()_+-=]*$')"
-            },
-            {
-            id: "password_allowed_chars",
-            message: "password can only contain letters, numbers, and specific special characters",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*$')"
+                id: "password_complexity",
+                message: "password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+                expression: "this.matches('[A-Z]') && this.matches('[a-z]') && this.matches('[0-9]') && this.matches('[!@#$%^&*_+-=]')"
             }
         ]
     }];
@@ -133,7 +113,7 @@ message UserIdResponse {
 }
 
 message GetUserRequest {
-    int64 id = 1;
+    int64 id = 1 [(buf.validate.field).int64.gt = -1];
 }
 
 message UserResponse {
@@ -156,29 +136,9 @@ message UpdateUserRequest {
             expression: "size(this) >= 12 && size(this) <= 20"
             },
             {
-            id: "password_uppercase",
-            message: "password must contain at least one uppercase letter",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[A-Z][A-Za-z0-9!@#$%^&*()_+-=]*$')"
-            },
-            {
-            id: "password_lowercase",
-            message: "password must contain at least one lowercase letter",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[a-z][A-Za-z0-9!@#$%^&*()_+-=]*$')"
-            },
-            {
-            id: "password_number",
-            message: "password must contain at least one number",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[0-9][A-Za-z0-9!@#$%^&*()_+-=]*$')"
-            },
-            {
-            id: "password_special",
-            message: "password must contain at least one special character",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*[!@#$%^&*()_+-=][A-Za-z0-9!@#$%^&*()_+-=]*$')"
-            },
-            {
-            id: "password_allowed_chars",
-            message: "password can only contain letters, numbers, and specific special characters",
-            expression: "this.matches('^[A-Za-z0-9!@#$%^&*()_+-=]*$')"
+                id: "password_complexity",
+                message: "password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+                expression: "this.matches('[A-Z]') && this.matches('[a-z]') && this.matches('[0-9]') && this.matches('[!@#$%^&*_+-=]')"
             }
         ]
     }];
@@ -189,7 +149,7 @@ message UpdateUserResponse {
 }
 
 message DeleteUserRequest {
-    int64 id = 1;
+    int64 id = 1 [(buf.validate.field).int64.gt = -1];
 }
 
 message DeleteUserResponse {
@@ -197,7 +157,7 @@ message DeleteUserResponse {
 }
 
 message UserAccountRequest {
-    int64 id = 1;
+    int64 id = 1 [(buf.validate.field).int64.gt = -1];
     string id_number = 2;
 }
 
@@ -207,7 +167,7 @@ message UserAccountResponse {
 }
 
 message GetUserAccountsRequest {
-    int64 id = 1;
+    int64 id = 1 [(buf.validate.field).int64.gt = -1];
 }
 
 message GetUserAccountsResponse {
@@ -225,11 +185,11 @@ message LoginRequest {
 
 message LoginResponse {
     string token = 1;
-    int64 expires_at = 2;
 }
 
 message LogoutRequest {
-    string token = 1;
+    int64 id = 1 [(buf.validate.field).int64.gt = -1];
+    string token = 2 [(buf.validate.field).string.min_len = 1];
 }
 
 message LogoutResponse {
