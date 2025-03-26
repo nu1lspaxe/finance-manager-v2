@@ -31,7 +31,7 @@ type Server struct {
 }
 
 func NewServer() (*Server, error) {
-	logger, err := NewZapLogger()
+	logger, err := utils.NewZapLogger()
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,10 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
-	grpcServer := NewGrpcServer(tlsConfig, logger)
+	jwtSecret := []byte(viper.GetString("jwt.secret"))
+	jwtManager := utils.NewJWTManager(jwtSecret)
+
+	grpcServer := NewGrpcServer(tlsConfig, logger, jwtManager.Clone())
 	gateway := NewGatewayServer(tlsConfig, logger)
 
 	ctx := context.Background()

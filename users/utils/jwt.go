@@ -32,6 +32,8 @@ func (j *JWTManager) Generate(userId int64, issueTime time.Time) (string, error)
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(issueTime),
 			ExpiresAt: jwt.NewNumericDate(issueTime.Add(j.tokenDuration)),
+			Issuer:    "users",
+			Audience:  jwt.ClaimStrings{"users", "records", "records_bank"},
 		},
 	}
 
@@ -65,6 +67,10 @@ func (j *JWTManager) Verify(tokenString string) (*UserJWTClaims, error) {
 
 	claims, ok := token.Claims.(*UserJWTClaims)
 	if !ok {
+		return nil, NewUserError(ErrTokenInvalid)
+	}
+
+	if claims.ExpiresAt.Time.Unix() < time.Now().Unix() {
 		return nil, NewUserError(ErrTokenInvalid)
 	}
 

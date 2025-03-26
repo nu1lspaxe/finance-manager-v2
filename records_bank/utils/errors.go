@@ -6,6 +6,8 @@ import (
 
 const (
 	ErrStatusCode = iota + 1
+	ErrTokenAlg
+	ErrTokenInvalid
 )
 
 type BankRecordError struct {
@@ -26,6 +28,10 @@ func GetErrorMessage(code int, opts ...string) string {
 	switch code {
 	case ErrStatusCode:
 		return fmt.Sprintf("status code error: %v", opts)
+	case ErrTokenAlg:
+		return fmt.Sprintf("token algorithm error: %v", opts)
+	case ErrTokenInvalid:
+		return fmt.Sprintf("invalid token: %v", opts)
 	default:
 		return "unknown error"
 	}

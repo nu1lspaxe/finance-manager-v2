@@ -35,7 +35,10 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
-	grpcServer := NewGrpcServer(tlsConfig, logger)
+	jwtSecret := []byte(viper.GetString("jwt.secret"))
+	jwtManager := utils.NewJWTManager(jwtSecret)
+
+	grpcServer := NewGrpcServer(tlsConfig, logger, jwtManager.Clone())
 	gateway := NewGatewayServer(tlsConfig, logger)
 
 	return &Server{
