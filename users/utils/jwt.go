@@ -19,14 +19,14 @@ func (j *JWTManager) Clone() *JWTManager {
 	return &JWTManager{j.secretKey, j.tokenDuration}
 }
 
-type UserJWTClaims struct {
+type FMJWTClaims struct {
 	UserId int64  `json:"user_id"`
 	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
 
 func (j *JWTManager) Generate(userId int64, issueTime time.Time) (string, error) {
-	claims := UserJWTClaims{
+	claims := FMJWTClaims{
 		UserId: userId,
 		Role:   "user",
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -47,10 +47,10 @@ func (j *JWTManager) Generate(userId int64, issueTime time.Time) (string, error)
 	return tokenString, nil
 }
 
-func (j *JWTManager) Verify(tokenString string) (*UserJWTClaims, error) {
+func (j *JWTManager) Verify(tokenString string) (*FMJWTClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		tokenString,
-		&UserJWTClaims{},
+		&FMJWTClaims{},
 		func(token *jwt.Token) (interface{}, error) {
 			_, ok := token.Method.(*jwt.SigningMethodHMAC)
 			if !ok {
@@ -65,7 +65,7 @@ func (j *JWTManager) Verify(tokenString string) (*UserJWTClaims, error) {
 		return nil, err
 	}
 
-	claims, ok := token.Claims.(*UserJWTClaims)
+	claims, ok := token.Claims.(*FMJWTClaims)
 	if !ok {
 		return nil, NewUserError(ErrTokenInvalid)
 	}
