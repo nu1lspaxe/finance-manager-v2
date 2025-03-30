@@ -10,7 +10,7 @@ import "buf/validate/validate.proto";
 service UserService {
     rpc CreateUser(CreateUserRequest) returns (UserResponse) {
         option (google.api.http) = {
-            post: "/v1/users"
+            post: "/v1/users/signup"
             body: "*"
         };
     }
@@ -57,7 +57,7 @@ service UserService {
 
     rpc Login(LoginRequest) returns (LoginResponse) {
         option (google.api.http) = {
-            post: "/v1/users/login"
+            post: "/v1/users/signin"
             body: "*"
         };
     }

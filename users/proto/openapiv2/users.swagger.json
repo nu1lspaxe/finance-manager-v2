@@ -45,14 +45,16 @@
         "tags": [
           "UserService"
         ]
-      },
+      }
+    },
+    "/v1/users/logout": {
       "post": {
-        "operationId": "UserService_CreateUser",
+        "operationId": "UserService_Logout",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersUserResponse"
+              "$ref": "#/definitions/usersLogoutResponse"
             }
           },
           "default": {
@@ -68,7 +70,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/usersCreateUserRequest"
+              "$ref": "#/definitions/usersLogoutRequest"
             }
           }
         ],
@@ -77,7 +79,7 @@
         ]
       }
     },
-    "/v1/users/login": {
+    "/v1/users/signin": {
       "post": {
         "operationId": "UserService_Login",
         "responses": {
@@ -109,14 +111,14 @@
         ]
       }
     },
-    "/v1/users/logout": {
+    "/v1/users/signup": {
       "post": {
-        "operationId": "UserService_Logout",
+        "operationId": "UserService_CreateUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersLogoutResponse"
+              "$ref": "#/definitions/usersUserResponse"
             }
           },
           "default": {
@@ -132,7 +134,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/usersLogoutRequest"
+              "$ref": "#/definitions/usersCreateUserRequest"
             }
           }
         ],
