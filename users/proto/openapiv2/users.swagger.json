@@ -444,6 +444,10 @@
     "usersLoginResponse": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
         "token": {
           "type": "string"
         }

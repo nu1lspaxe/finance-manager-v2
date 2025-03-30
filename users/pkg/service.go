@@ -43,20 +43,20 @@ func NewUserService(
 	}
 }
 
-func (u *UserService) Login(ctx context.Context, email, password string) (string, error) {
+func (u *UserService) Login(ctx context.Context, email, password string) (int64, string, error) {
 	user, err := u.repo.GetUserByEmail(ctx, email)
 	if err != nil {
-		return "", err
+		return utils.INVALID, "", err
 	}
 
 	if !utils.CheckPasswordHash(password, user.Password) {
-		return "", utils.NewUserError(utils.ErrPasswdInvalid)
+		return utils.INVALID, "", utils.NewUserError(utils.ErrPasswdInvalid)
 	}
 
 	issueTime := time.Now()
 	tokenString, err := u.jwtManager.Generate(user.ID, issueTime)
 	if err != nil {
-		return "", err
+		return utils.INVALID, "", err
 	}
 
 	key := fmt.Sprintf("user:%d", user.ID)
@@ -66,15 +66,15 @@ func (u *UserService) Login(ctx context.Context, email, password string) (string
 		"token": tokenString,
 	}).Err()
 	if err != nil {
-		return "", err
+		return utils.INVALID, "", err
 	}
 
 	err = u.redisClient.Expire(ctx, key, expiryTime).Err()
 	if err != nil {
-		return "", err
+		return utils.INVALID, "", err
 	}
 
-	return tokenString, nil
+	return user.ID, tokenString, nil
 }
 
 func (u *UserService) Logout(ctx context.Context, userId int64, token string) error {

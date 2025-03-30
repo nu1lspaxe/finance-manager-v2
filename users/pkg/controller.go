@@ -26,11 +26,11 @@ func (c *UserController) Login(ctx context.Context, req *proto.LoginRequest) (*p
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	token, err := c.service.Login(ctx, req.Email, req.Password)
+	userId, token, err := c.service.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.LoginResponse{Token: token}, nil
+	return &proto.LoginResponse{Id: userId, Token: token}, nil
 }
 
 func (c *UserController) Logout(ctx context.Context, req *proto.LogoutRequest) (*proto.LogoutResponse, error) {
