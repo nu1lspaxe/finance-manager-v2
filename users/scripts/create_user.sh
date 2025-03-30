@@ -1,8 +1,8 @@
-curl -X POST https://localhost:8443/v1/users \
+curl -X POST https://localhost:8443/v1/users/signup \
   --cacert certs/cert.pem \
   -d '{"username": "test1", "email": "test1@example.com", "password": "SECpassword123"}'
 
-curl -X POST https://localhost:8443/v1/users \
+curl -X POST https://localhost:8443/v1/users/signup \
   --cacert certs/cert.pem \
   -d '{"username": "test2", "email": "test2@example.com", "password": "SECpassword123"}'
 
