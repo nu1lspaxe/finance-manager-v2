@@ -33,7 +33,7 @@ func TestCreateUser(t *testing.T) {
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
 
-		_, err := service.CreateUser(ctx, "testuser", "test@example.com", "password")
+		_, err := service.SignUp(ctx, "testuser", "test@example.com", "password")
 		assert.NoError(t, err)
 		mockRepo.AssertExpectations(t)
 	})
@@ -48,7 +48,7 @@ func TestCreateUser(t *testing.T) {
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
 
-		_, err := service.CreateUser(ctx, "testuser", "test@example.com", "password")
+		_, err := service.SignUp(ctx, "testuser", "test@example.com", "password")
 		assert.Error(t, err)
 		mockRepo.AssertExpectations(t)
 	})
@@ -65,7 +65,7 @@ func TestCreateUser(t *testing.T) {
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
 
-		_, err := service.CreateUser(ctx, "testuser", "test@example.com", "password")
+		_, err := service.SignUp(ctx, "testuser", "test@example.com", "password")
 		assert.Error(t, err)
 		assert.Equal(t, "repository error", err.Error())
 		mockRepo.AssertExpectations(t)

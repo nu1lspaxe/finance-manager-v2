@@ -43,7 +43,7 @@ func NewUserService(
 	}
 }
 
-func (u *UserService) Login(ctx context.Context, email, password string) (int64, string, error) {
+func (u *UserService) SignIn(ctx context.Context, email, password string) (int64, string, error) {
 	user, err := u.repo.GetUserByEmail(ctx, email)
 	if err != nil {
 		return utils.INVALID, "", err
@@ -95,7 +95,7 @@ func (u *UserService) Logout(ctx context.Context, userId int64, token string) er
 	return nil
 }
 
-func (u *UserService) CreateUser(ctx context.Context, username, email, password string) (*sqlc.FMUser, error) {
+func (u *UserService) SignUp(ctx context.Context, username, email, password string) (*sqlc.FMUser, error) {
 	exists, err := u.repo.CheckUserEmailExists(ctx, email)
 	if err != nil {
 		return nil, err

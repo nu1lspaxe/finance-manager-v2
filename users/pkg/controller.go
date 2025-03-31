@@ -17,7 +17,7 @@ func NewUserController(service *UserService) *UserController {
 	return &UserController{service: service}
 }
 
-func (c *UserController) Login(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {
+func (c *UserController) SignIn(ctx context.Context, req *proto.SignInRequest) (*proto.SignInResponse, error) {
 	err := protovalidate.Validate(req)
 	if err != nil {
 		return nil, err
@@ -26,11 +26,11 @@ func (c *UserController) Login(ctx context.Context, req *proto.LoginRequest) (*p
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	userId, token, err := c.service.Login(ctx, req.Email, req.Password)
+	userId, token, err := c.service.SignIn(ctx, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.LoginResponse{UserId: userId, Token: token}, nil
+	return &proto.SignInResponse{UserId: userId, Token: token}, nil
 }
 
 func (c *UserController) Logout(ctx context.Context, req *proto.LogoutRequest) (*proto.LogoutResponse, error) {
@@ -49,7 +49,7 @@ func (c *UserController) Logout(ctx context.Context, req *proto.LogoutRequest) (
 	return &proto.LogoutResponse{Success: true}, nil
 }
 
-func (c *UserController) CreateUser(ctx context.Context, req *proto.CreateUserRequest) (*proto.UserResponse, error) {
+func (c *UserController) CreateUser(ctx context.Context, req *proto.SignUpRequest) (*proto.UserResponse, error) {
 	err := protovalidate.Validate(req)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (c *UserController) CreateUser(ctx context.Context, req *proto.CreateUserRe
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	user, err := c.service.CreateUser(ctx, req.Username, req.Email, req.Password)
+	user, err := c.service.SignUp(ctx, req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}

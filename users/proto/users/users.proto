@@ -8,9 +8,21 @@ import "google/api/annotations.proto";
 import "buf/validate/validate.proto";
 
 service UserService {
-    rpc CreateUser(CreateUserRequest) returns (UserResponse) {
+    rpc SignUp(SignUpRequest) returns (UserResponse) {
         option (google.api.http) = {
             post: "/v1/users/signup"
+            body: "*"
+        };
+    }
+    rpc SignIn(SignInRequest) returns (SignInResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/signin"
+            body: "*"
+        };
+    }
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/logout"
             body: "*"
         };
     }
@@ -54,19 +66,6 @@ service UserService {
     }
 
     rpc UpdateUserAccountBalance(UserAccountRequest) returns (UserAccountResponse) {}
-
-    rpc Login(LoginRequest) returns (LoginResponse) {
-        option (google.api.http) = {
-            post: "/v1/users/signin"
-            body: "*"
-        };
-    }
-    rpc Logout(LogoutRequest) returns (LogoutResponse) {
-        option (google.api.http) = {
-            post: "/v1/users/logout"
-            body: "*"
-        };
-    }
 }
 
 message User {
@@ -83,7 +82,7 @@ message UserAccount {
     double balance = 2;
 }
 
-message CreateUserRequest {
+message SignUpRequest {
     string username = 1 [(buf.validate.field).string.min_len = 1];
     string email = 2 [(buf.validate.field).cel = {
         id: "valid_email"
@@ -174,7 +173,7 @@ message GetUserAccountsResponse {
     repeated UserAccount accounts = 1;
 }
 
-message LoginRequest {
+message SignInRequest {
     string email = 1 [(buf.validate.field).cel = {
         id: "valid_email"
         message: "email must be a valid email"
@@ -183,7 +182,7 @@ message LoginRequest {
     string password = 2;
 }
 
-message LoginResponse {
+message SignInResponse {
     int64 user_id = 1;
     string token = 2;
 }

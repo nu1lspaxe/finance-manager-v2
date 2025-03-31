@@ -81,12 +81,12 @@
     },
     "/v1/users/signin": {
       "post": {
-        "operationId": "UserService_Login",
+        "operationId": "UserService_SignIn",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersLoginResponse"
+              "$ref": "#/definitions/usersSignInResponse"
             }
           },
           "default": {
@@ -102,7 +102,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/usersLoginRequest"
+              "$ref": "#/definitions/usersSignInRequest"
             }
           }
         ],
@@ -113,7 +113,7 @@
     },
     "/v1/users/signup": {
       "post": {
-        "operationId": "UserService_CreateUser",
+        "operationId": "UserService_SignUp",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -134,7 +134,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/usersCreateUserRequest"
+              "$ref": "#/definitions/usersSignUpRequest"
             }
           }
         ],
@@ -398,20 +398,6 @@
         }
       }
     },
-    "usersCreateUserRequest": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
     "usersDeleteUserResponse": {
       "type": "object",
       "properties": {
@@ -432,29 +418,6 @@
         }
       }
     },
-    "usersLoginRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "usersLoginResponse": {
-      "type": "object",
-      "properties": {
-        "userId": {
-          "type": "string",
-          "format": "int64"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
     "usersLogoutRequest": {
       "type": "object",
       "properties": {
@@ -472,6 +435,43 @@
       "properties": {
         "success": {
           "type": "boolean"
+        }
+      }
+    },
+    "usersSignInRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "usersSignInResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "usersSignUpRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
         }
       }
     },
