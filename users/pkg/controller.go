@@ -30,7 +30,7 @@ func (c *UserController) Login(ctx context.Context, req *proto.LoginRequest) (*p
 	if err != nil {
 		return nil, err
 	}
-	return &proto.LoginResponse{Id: userId, Token: token}, nil
+	return &proto.LoginResponse{UserId: userId, Token: token}, nil
 }
 
 func (c *UserController) Logout(ctx context.Context, req *proto.LogoutRequest) (*proto.LogoutResponse, error) {
@@ -42,7 +42,7 @@ func (c *UserController) Logout(ctx context.Context, req *proto.LogoutRequest) (
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	err = c.service.Logout(ctx, req.Id, req.Token)
+	err = c.service.Logout(ctx, req.UserId, req.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *UserController) CreateUser(ctx context.Context, req *proto.CreateUserRe
 }
 
 func (c *UserController) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.UserResponse, error) {
-	user, err := c.service.GetUser(ctx, req.Id)
+	user, err := c.service.GetUser(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (c *UserController) GetAllUsers(_ *proto.EmptyRequest, stream proto.UserSer
 	}
 
 	for _, userId := range userIds {
-		err := stream.Send(&proto.UserIdResponse{Id: userId})
+		err := stream.Send(&proto.UserIdResponse{UserId: userId})
 		if err != nil {
 			return err
 		}
@@ -101,7 +101,7 @@ func (c *UserController) UpdateUser(ctx context.Context, req *proto.UpdateUserRe
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	err = c.service.UpdateUser(ctx, req.Id, req.Username, req.Email, req.Password)
+	err = c.service.UpdateUser(ctx, req.UserId, req.Username, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *UserController) DeleteUser(ctx context.Context, req *proto.DeleteUserRe
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	err := c.service.DeleteUser(ctx, req.Id)
+	err := c.service.DeleteUser(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (c *UserController) AddUserAccount(ctx context.Context, req *proto.UserAcco
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	balance, err := c.service.AddAccount(ctx, req.Id, req.IdNumber)
+	balance, err := c.service.AddAccount(ctx, req.UserId, req.IdNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (c *UserController) GetUserAccounts(ctx context.Context, req *proto.GetUser
 	ctx, cancel := context.WithTimeout(ctx, utils.TIMEOUT)
 	defer cancel()
 
-	accounts, err := c.service.GetUserAccounts(ctx, req.Id)
+	accounts, err := c.service.GetUserAccounts(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}

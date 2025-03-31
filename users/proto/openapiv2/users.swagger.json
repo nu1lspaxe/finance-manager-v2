@@ -143,7 +143,7 @@
         ]
       }
     },
-    "/v1/users/{id}": {
+    "/v1/users/{userId}": {
       "get": {
         "operationId": "UserService_GetUser",
         "responses": {
@@ -162,7 +162,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string",
@@ -191,7 +191,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string",
@@ -220,7 +220,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string",
@@ -240,7 +240,7 @@
         ]
       }
     },
-    "/v1/users/{id}/accounts": {
+    "/v1/users/{userId}/accounts": {
       "get": {
         "operationId": "UserService_GetUserAccounts",
         "responses": {
@@ -259,7 +259,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string",
@@ -271,7 +271,7 @@
         ]
       }
     },
-    "/v1/users/{id}/accounts/{idNumber}": {
+    "/v1/users/{userId}/accounts/{idNumber}": {
       "delete": {
         "operationId": "UserService_DeleteUserAccount",
         "responses": {
@@ -290,7 +290,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string",
@@ -325,7 +325,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string",
@@ -446,7 +446,7 @@
     "usersLoginResponse": {
       "type": "object",
       "properties": {
-        "id": {
+        "userId": {
           "type": "string",
           "format": "int64"
         },
@@ -458,7 +458,7 @@
     "usersLogoutRequest": {
       "type": "object",
       "properties": {
-        "id": {
+        "userId": {
           "type": "string",
           "format": "int64"
         },
@@ -536,7 +536,7 @@
     "usersUserIdResponse": {
       "type": "object",
       "properties": {
-        "id": {
+        "userId": {
           "type": "string",
           "format": "int64"
         }
