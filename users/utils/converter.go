@@ -6,14 +6,14 @@ import (
 	"users/postgres/sqlc"
 )
 
-func SqlcToProto_FMUser(user *sqlc.FMUser) *proto.User {
+func SqlcToProto_FMUser(id int64, username string, email string, password string, createdAt, updatedAt int64) *proto.User {
 	return &proto.User{
-		Id:        user.ID,
-		Username:  user.Username,
-		Email:     user.Email,
-		Password:  user.Password,
-		CreatedAt: user.CreatedAt.Time.Unix(),
-		UpdatedAt: user.UpdatedAt.Time.Unix(),
+		Id:        id,
+		Username:  username,
+		Email:     email,
+		Password:  password,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
 	}
 }
 

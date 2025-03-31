@@ -117,6 +117,7 @@ message GetUserRequest {
 
 message UserResponse {
     User user = 1;
+    repeated string account_numbers = 2;
 }
 
 message UpdateUserRequest {

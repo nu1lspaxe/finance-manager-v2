@@ -7,6 +7,8 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const addAccount = `-- name: AddAccount :one
@@ -183,12 +185,28 @@ func (q *Queries) GetUserAccounts(ctx context.Context, userID int64) ([]FMAccoun
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, username, email, password, created_at, updated_at FROM "FM_User" WHERE email = $1
+SELECT 
+  u.id, u.username, u.email, u.password, u.created_at, u.updated_at,
+  ARRAY_AGG(COALESCE(a.id_number, ''))::TEXT[] AS account_numbers
+FROM "FM_User" u
+LEFT JOIN "FM_Account" a ON u.id = a.user_id
+WHERE u.email = $1
+GROUP BY u.id
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (FMUser, error) {
+type GetUserByEmailRow struct {
+	ID             int64              `json:"id"`
+	Username       string             `json:"username"`
+	Email          string             `json:"email"`
+	Password       string             `json:"password"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+	AccountNumbers []string           `json:"account_numbers"`
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
 	row := q.db.QueryRow(ctx, getUserByEmail, email)
-	var i FMUser
+	var i GetUserByEmailRow
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
@@ -196,17 +214,34 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (FMUser, err
 		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.AccountNumbers,
 	)
 	return i, err
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, username, email, password, created_at, updated_at FROM "FM_User" WHERE id = $1
+SELECT 
+  u.id, u.username, u.email, u.password, u.created_at, u.updated_at,
+  ARRAY_AGG(COALESCE(a.id_number, ''))::TEXT[] AS account_numbers
+FROM "FM_User" u
+LEFT JOIN "FM_Account" a ON u.id = a.user_id
+WHERE u.id = $1
+GROUP BY u.id
 `
 
-func (q *Queries) GetUserById(ctx context.Context, id int64) (FMUser, error) {
+type GetUserByIdRow struct {
+	ID             int64              `json:"id"`
+	Username       string             `json:"username"`
+	Email          string             `json:"email"`
+	Password       string             `json:"password"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+	AccountNumbers []string           `json:"account_numbers"`
+}
+
+func (q *Queries) GetUserById(ctx context.Context, id int64) (GetUserByIdRow, error) {
 	row := q.db.QueryRow(ctx, getUserById, id)
-	var i FMUser
+	var i GetUserByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
@@ -214,6 +249,7 @@ func (q *Queries) GetUserById(ctx context.Context, id int64) (FMUser, error) {
 		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.AccountNumbers,
 	)
 	return i, err
 }

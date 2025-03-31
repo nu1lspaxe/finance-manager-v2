@@ -116,7 +116,7 @@ func (u *UserService) SignUp(ctx context.Context, username, email, password stri
 	return &user, nil
 }
 
-func (u *UserService) GetUser(ctx context.Context, userId int64) (*sqlc.FMUser, error) {
+func (u *UserService) GetUser(ctx context.Context, userId int64) (*sqlc.GetUserByIdRow, error) {
 	user, err := u.repo.GetUserById(ctx, userId)
 	if err != nil {
 		return nil, err

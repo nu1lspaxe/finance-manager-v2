@@ -16,10 +16,22 @@ SELECT EXISTS (
 ) AS email_exists;
 
 -- name: GetUserById :one
-SELECT * FROM "FM_User" WHERE id = $1;
+SELECT 
+  u.*,
+  ARRAY_AGG(COALESCE(a.id_number, ''))::TEXT[] AS account_numbers
+FROM "FM_User" u
+LEFT JOIN "FM_Account" a ON u.id = a.user_id
+WHERE u.id = $1
+GROUP BY u.id;
 
 -- name: GetUserByEmail :one
-SELECT * FROM "FM_User" WHERE email = $1;
+SELECT 
+  u.*,
+  ARRAY_AGG(COALESCE(a.id_number, ''))::TEXT[] AS account_numbers
+FROM "FM_User" u
+LEFT JOIN "FM_Account" a ON u.id = a.user_id
+WHERE u.email = $1
+GROUP BY u.id;
 
 -- name: GetAllUsers :many
 SELECT id FROM "FM_User" ORDER BY created_at;

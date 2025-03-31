@@ -547,6 +547,12 @@
       "properties": {
         "user": {
           "$ref": "#/definitions/usersUser"
+        },
+        "accountNumbers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

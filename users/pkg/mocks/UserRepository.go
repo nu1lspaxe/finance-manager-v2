@@ -242,22 +242,22 @@ func (_m *UserRepository) GetUserAccounts(ctx context.Context, userId int64) ([]
 }
 
 // GetUserByEmail provides a mock function with given fields: ctx, email
-func (_m *UserRepository) GetUserByEmail(ctx context.Context, email string) (sqlc.FMUser, error) {
+func (_m *UserRepository) GetUserByEmail(ctx context.Context, email string) (sqlc.GetUserByEmailRow, error) {
 	ret := _m.Called(ctx, email)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserByEmail")
 	}
 
-	var r0 sqlc.FMUser
+	var r0 sqlc.GetUserByEmailRow
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (sqlc.FMUser, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (sqlc.GetUserByEmailRow, error)); ok {
 		return rf(ctx, email)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) sqlc.FMUser); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) sqlc.GetUserByEmailRow); ok {
 		r0 = rf(ctx, email)
 	} else {
-		r0 = ret.Get(0).(sqlc.FMUser)
+		r0 = ret.Get(0).(sqlc.GetUserByEmailRow)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
@@ -270,22 +270,22 @@ func (_m *UserRepository) GetUserByEmail(ctx context.Context, email string) (sql
 }
 
 // GetUserById provides a mock function with given fields: ctx, id
-func (_m *UserRepository) GetUserById(ctx context.Context, id int64) (sqlc.FMUser, error) {
+func (_m *UserRepository) GetUserById(ctx context.Context, id int64) (sqlc.GetUserByIdRow, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserById")
 	}
 
-	var r0 sqlc.FMUser
+	var r0 sqlc.GetUserByIdRow
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int64) (sqlc.FMUser, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) (sqlc.GetUserByIdRow, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int64) sqlc.FMUser); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) sqlc.GetUserByIdRow); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(sqlc.FMUser)
+		r0 = ret.Get(0).(sqlc.GetUserByIdRow)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {

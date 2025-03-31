@@ -11,8 +11,8 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, username, email, password string) (sqlc.FMUser, error)
 	CheckUserExists(ctx context.Context, id int64) (bool, error)
 	CheckUserEmailExists(ctx context.Context, email string) (bool, error)
-	GetUserById(ctx context.Context, id int64) (sqlc.FMUser, error)
-	GetUserByEmail(ctx context.Context, email string) (sqlc.FMUser, error)
+	GetUserById(ctx context.Context, id int64) (sqlc.GetUserByIdRow, error)
+	GetUserByEmail(ctx context.Context, email string) (sqlc.GetUserByEmailRow, error)
 	GetAllUsers(ctx context.Context) ([]int64, error)
 	UpdateUser(ctx context.Context, d int64, username, email string, password string) error
 	DeleteUser(ctx context.Context, id int64) error
@@ -64,18 +64,18 @@ func (u *userRepositoryImpl) CheckUserEmailExists(ctx context.Context, email str
 	return exists, nil
 }
 
-func (u *userRepositoryImpl) GetUserById(ctx context.Context, id int64) (sqlc.FMUser, error) {
+func (u *userRepositoryImpl) GetUserById(ctx context.Context, id int64) (sqlc.GetUserByIdRow, error) {
 	user, err := u.queries.GetUserById(ctx, id)
 	if err != nil {
-		return sqlc.FMUser{}, err
+		return sqlc.GetUserByIdRow{}, err
 	}
 	return user, nil
 }
 
-func (u *userRepositoryImpl) GetUserByEmail(ctx context.Context, email string) (sqlc.FMUser, error) {
+func (u *userRepositoryImpl) GetUserByEmail(ctx context.Context, email string) (sqlc.GetUserByEmailRow, error) {
 	user, err := u.queries.GetUserByEmail(ctx, email)
 	if err != nil {
-		return sqlc.FMUser{}, err
+		return sqlc.GetUserByEmailRow{}, err
 	}
 	return user, nil
 }

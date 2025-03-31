@@ -62,7 +62,10 @@ func (c *UserController) CreateUser(ctx context.Context, req *proto.SignUpReques
 	if err != nil {
 		return nil, err
 	}
-	return &proto.UserResponse{User: utils.SqlcToProto_FMUser(user)}, nil
+
+	protoUser := utils.SqlcToProto_FMUser(user.ID, user.Username, user.Email, user.Password, user.CreatedAt.Time.Unix(), user.UpdatedAt.Time.Unix())
+
+	return &proto.UserResponse{User: protoUser}, nil
 }
 
 func (c *UserController) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.UserResponse, error) {
@@ -70,7 +73,12 @@ func (c *UserController) GetUser(ctx context.Context, req *proto.GetUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.UserResponse{User: utils.SqlcToProto_FMUser(user)}, nil
+
+	protoUser := utils.SqlcToProto_FMUser(user.ID, user.Username, user.Email, user.Password, user.CreatedAt.Time.Unix(), user.UpdatedAt.Time.Unix())
+
+	return &proto.UserResponse{
+		User:           protoUser,
+		AccountNumbers: user.AccountNumbers}, nil
 }
 
 func (c *UserController) GetAllUsers(_ *proto.EmptyRequest, stream proto.UserService_GetAllUsersServer) error {
