@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"records/proto"
+	"records_bank/proto"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.uber.org/zap"
@@ -36,7 +36,7 @@ func NewGatewayServer(tlsConfig *tls.Config, logger *zap.Logger) *GatewayServer 
 func (g *GatewayServer) Start(ctx context.Context, httpAddr string, grpcAddr string) error {
 	creds := credentials.NewTLS(g.server.TLSConfig)
 
-	err := proto.RegisterRecordServiceHandlerFromEndpoint(
+	err := proto.RegisterBankRecordServiceHandlerFromEndpoint(
 		ctx,
 		g.server.Handler.(*runtime.ServeMux),
 		fmt.Sprintf(":%s", grpcAddr),

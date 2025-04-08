@@ -49,7 +49,7 @@ func (c *UserController) Logout(ctx context.Context, req *proto.LogoutRequest) (
 	return &proto.LogoutResponse{Success: true}, nil
 }
 
-func (c *UserController) CreateUser(ctx context.Context, req *proto.SignUpRequest) (*proto.UserResponse, error) {
+func (c *UserController) SignUp(ctx context.Context, req *proto.SignUpRequest) (*proto.UserResponse, error) {
 	err := protovalidate.Validate(req)
 	if err != nil {
 		return nil, err

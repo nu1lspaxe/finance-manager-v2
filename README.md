@@ -15,6 +15,8 @@ We use `mkcert` to generate certificates, please follow the steps:
 mkcert localhost 127.0.0.1 ::1 <wsl_ip_addr>
 ```
 
+> In powershell, run `mkcert -CAROOT` to get ca-root file location
+
 ## gRPC CLI
 
 We use [Evans CLI](https://github.com/ktr0731/evans) for interacting with gRPC server.

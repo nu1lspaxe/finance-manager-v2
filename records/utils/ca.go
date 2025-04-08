@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var certFile, keyFile string
+var certFile, keyFile, caFile string
 
 func init() {
 	viper.AddConfigPath("./configs")
@@ -19,6 +19,7 @@ func init() {
 
 	certFile = viper.GetString("certs.path.cert")
 	keyFile = viper.GetString("certs.path.key")
+	caFile = viper.GetString("certs.path.ca")
 
 	// err := setupCertificate()
 	// if err != nil {
@@ -32,7 +33,7 @@ func LoadTLSConfig() (*tls.Config, error) {
 		return nil, err
 	}
 
-	caCert, err := os.ReadFile(certFile)
+	caCert, err := os.ReadFile(caFile)
 	if err != nil {
 		return nil, err
 	}

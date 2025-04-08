@@ -111,6 +111,51 @@ services:
       - pg-0
       - pg-1
 
+
+  users:
+    build:
+      context: ./users
+      dockerfile: Dockerfile
+    container_name: users
+    ports:
+      - 8443:8443
+      - 9443:9443
+    networks:
+      - finance-manager-network
+    depends_on:
+      - pg-0
+      - pg-1
+
+
+  records:
+    build:
+      context: ./records
+      dockerfile: Dockerfile
+    container_name: records
+    ports:
+      - 8444:8444
+      - 9444:9444
+    networks:
+      - finance-manager-network
+    depends_on:
+      - pg-0
+      - pg-1
+
+
+  records_bank:
+    build:
+      context: ./records_bank
+      dockerfile: Dockerfile
+    container_name: records_bank
+    ports:
+      - 8445:8445
+      - 9445:9445
+    networks:
+      - finance-manager-network
+    depends_on:
+      - pg-0
+      - pg-1
+
 volumes:
   pg_0_data:
   pg_1_data:

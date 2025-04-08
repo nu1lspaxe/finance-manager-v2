@@ -17,7 +17,8 @@ Fill the values for the `configs/config.json`
     "certs": {
         "path": {
             "cert": "certs/cert.pem",
-            "key": "certs/key.pem"
+            "key": "certs/key.pem",
+            "ca": "certs/ca.pem"
         }
     },
     "jwt": {
