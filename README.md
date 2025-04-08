@@ -4,18 +4,25 @@ Different from [finance-manager](https://github.com/nu1lspaxe/finance-manager), 
 
 ## CA Certificates
 
-The self-signed certificates are used in all services. For current (local-dev) version, we use all the same `cert.pem` and `key.pem` in `certs/` folder which placed in every services.
+The self-signed certificates are used in all services.
 
-We use `mkcert` to generate certificates, please follow the steps:
+1. We use `mkcert` to generate certificates, please follow the steps:
 
-```bash
-# 1. In WSL2, get WSL2 ip address by command `ip a`
-# 2. Find eth0 or other interface, it should contains `inet 172.XXX.XXX.XXX/20`
-# 3. Run the command in powershell, replace <wsl_ip_addr> with 172.XXX.XXX.XXX/20
-mkcert localhost 127.0.0.1 ::1 <wsl_ip_addr>
-```
+  ```bash
+  # 1. In WSL2, get WSL2 ip address by command `ip a`
+  # 2. Find eth0 or other interface, it should contains `inet 172.XXX.XXX.XXX/20`
+  # 3. Run the command in powershell, replace <wsl_ip_addr> with 172.XXX.XXX.XXX/20
+  # 4. <service_name> stands for bank_syste, records, users, records_bank in this project
+  mkcert localhost 127.0.0.1 ::1 <wsl_ip_addr> <service_name>
 
-> In powershell, run `mkcert -CAROOT` to get ca-root file location
+  ### Explanation
+  # - <wsl_ip_addr> used to allow our (frontend) flutter communicate with our services
+  # - <service_name> used as domain name to allow our services communicate within docker environment
+  ```
+
+2. Two files `localhost+4.pem` and `localhost+4-key.pem`　you will see after running step 1. Try to rename these two file with `cert.pem` and `key.pem` and move them into `<service_name>/certs` 
+
+3. In powershell, run `mkcert -CAROOT` to get ca-root file location. There should have two files: `rootCA.pem` and `rootCA-key.pem` within the given path. Rename `rootCA.pem` into `ca.pem` then copy the file into each `<service_name>/certs`
 
 ## gRPC CLI
 
@@ -44,55 +51,20 @@ Bank system will run 3 cornjobs once the server starting in order to simulate re
 
 ### Users
 
-#### Sign In (Login)
-
-- `[POST] /users/signin`
-
-#### Logout
-
-- `[POST] /users/logout`
-
-#### Sign Up (CreateUser)
-
-- `[POST] /users/signup`
-
-#### GetUserByID
-
+- `[POST] /v1/user`
 - `[GET] /users/{id}`
-
-#### GetUserAccounts
-
 - `[GET] /users/{id}/accounts`
-
-#### GetAllUsers
-
 - `[GET] /users`
-
-#### UpdateUser
-
 - `[PUT] /users/{id}`
 
 ### Accounts
 
-#### CreateAccount
-
 - `[POST] /accounts`
-
-#### GetAccountByID
-
 - `[GET] /accounts/{id}`
-
-#### GetAccountBalance
-
 - `[GET] /accounts/{id}/balance`
-
-#### GetAllAccounts
-
 - `[GET] /accounts`
 
 ### Transactions
-
-#### GetTransactionByID
 
 - `[GET] /transactions/{id}`
 
@@ -102,53 +74,26 @@ Bank system will run 3 cornjobs once the server starting in order to simulate re
 
 > Supporting protocols : HTTP/1.1, GRPC (HTTP/2)
 
-#### CreateUser
-
-- `[POST] /v1/user`
-
-#### GetUser
-
+- `[POST] /users/signin`
+- `[POST] /users/logout`
+- `[POST] /users/signup`
 - `[GET] /v1/users/{id}`
-
-#### GetAllUsers
-
 - `[GET] /v1/users`
-
-#### UpdateUser
-
 - `[Patch] /v1/users/{id}`
-
-#### DeleteUser
-
 - `[Delete] /v1/users/{id}`
 
 ### Records
 
 > Supporting protocols : HTTP/1.1, GRPC (HTTP/2)
 
-#### CreateRecord
-
 - `[POST] /v1/records`
-
-#### GetRecord
-
 - `[GET] /v1/records/{id}`
-
-#### GetUserRecordsWithFilters
-
 - `[GET] /v1/records/user`
-- parameters:
   - user_id
   - record_type
   - start_time
   - end_time
-
-#### UpdateRecord
-
 - `[PATCH] /v1/records/{id}`
-
-#### DeleteRecord
-
 - `[DELETE] /v1/records/{id}`
 
 ### Bank Records
