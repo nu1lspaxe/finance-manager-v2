@@ -2,6 +2,14 @@
 
 Different from [finance-manager](https://github.com/nu1lspaxe/finance-manager), the finance-manager-v2 is designed with microservice pattern and combined the utilities with Kafka and gRPC.
 
+## Todo List
+- [ ] Clickhouse CDC from Postgres (Kafka + Debezium)
+- [ ] ETL
+- [ ] Binance API 
+- [ ] Microservice single-sign on for each service database 
+  - After a user sign in, server has to store token into corresponding database by the services which are authorized to the user
+  - Need to ensure token synchronicity
+
 ## CA Certificates
 
 The self-signed certificates are used in all services.
