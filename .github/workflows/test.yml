@@ -15,5 +15,7 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: '1.24'
+      - name: set up go modules
+        run: go mod tidy
       - name: run tests
         run: find . -name 'go.mod' -exec dirname {} \; | xargs -I{} bash -c 'cd "{}" && go test ./...'
