@@ -18,7 +18,7 @@ func TestCreateRecord(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("CreateRecord", int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
+			On("CreateRecord", ctx, int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
 			Return(sqlc.FMRecord{
 				ID:              1,
 				UserID:          1,
@@ -40,7 +40,7 @@ func TestCreateRecord(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("CreateRecord", int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
+			On("CreateRecord", ctx, int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
 			Return(sqlc.FMRecord{}, errors.New("repository error"))
 
 		service := NewRecordService(mockRepo)
@@ -57,7 +57,7 @@ func TestGetRecord(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("GetRecord", int64(1)).
+			On("GetRecord", ctx, int64(1)).
 			Return(&sqlc.FMRecord{
 				ID:              1,
 				UserID:          1,
@@ -79,7 +79,7 @@ func TestGetRecord(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("GetRecord", int64(1)).
+			On("GetRecord", ctx, int64(1)).
 			Return(&sqlc.FMRecord{}, errors.New("repository error"))
 
 		service := NewRecordService(mockRepo)
@@ -96,7 +96,7 @@ func TestGetUserRecordsWithFilters(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("GetUserRecords", int64(1)).
+			On("GetUserRecords", ctx, int64(1)).
 			Return([]sqlc.FMRecord{
 				{
 					ID:              1,
@@ -120,7 +120,7 @@ func TestGetUserRecordsWithFilters(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("GetUserRecords", int64(1)).
+			On("GetUserRecords", ctx, int64(1)).
 			Return([]sqlc.FMRecord{}, errors.New("repository error"))
 
 		service := NewRecordService(mockRepo)
@@ -137,7 +137,7 @@ func TestUpdateRecord(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("UpdateRecord", int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
+			On("UpdateRecord", ctx, int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
 			Return(nil)
 
 		service := NewRecordService(mockRepo)
@@ -152,7 +152,7 @@ func TestUpdateRecord(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("UpdateRecord", int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
+			On("UpdateRecord", ctx, int64(1), float32(100.0), time.Now().Unix(), "expense", "test record").
 			Return(errors.New("repository error"))
 
 		service := NewRecordService(mockRepo)
@@ -169,7 +169,7 @@ func TestDeleteRecord(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("DeleteRecord", int64(1)).
+			On("DeleteRecord", ctx, int64(1)).
 			Return(nil)
 
 		service := NewRecordService(mockRepo)
@@ -184,7 +184,7 @@ func TestDeleteRecord(t *testing.T) {
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
-			On("DeleteRecord", int64(1)).
+			On("DeleteRecord", ctx, int64(1)).
 			Return(errors.New("repository error"))
 
 		service := NewRecordService(mockRepo)

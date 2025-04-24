@@ -21,9 +21,9 @@ func TestCreateUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("CheckUserEmailExists", "test@example.com").
+			On("CheckUserEmailExists", ctx, "test@example.com").
 			Return(false, nil).
-			On("CreateUser", "testuser", "test@example.com", mock.Anything).
+			On("CreateUser", ctx, "testuser", "test@example.com", mock.Anything).
 			Return(sqlc.FMUser{
 				ID:       1,
 				Username: "testuser",
@@ -43,7 +43,7 @@ func TestCreateUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("CheckUserEmailExists", "test@example.com").
+			On("CheckUserEmailExists", ctx, "test@example.com").
 			Return(true, nil)
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
@@ -58,9 +58,9 @@ func TestCreateUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("CheckUserEmailExists", "test@example.com").
+			On("CheckUserEmailExists", ctx, "test@example.com").
 			Return(false, nil).
-			On("CreateUser", "testuser", "test@example.com", mock.Anything).
+			On("CreateUser", ctx, "testuser", "test@example.com", mock.Anything).
 			Return(sqlc.FMUser{}, errors.New("repository error"))
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
@@ -78,8 +78,8 @@ func TestGetUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("GetUser", int64(1)).
-			Return(sqlc.FMUser{
+			On("GetUserById", ctx, int64(1)).
+			Return(sqlc.GetUserByIdRow{
 				ID:       1,
 				Username: "testuser",
 				Email:    "test@example.com",
@@ -98,8 +98,8 @@ func TestGetUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("GetUser", int64(1)).
-			Return(sqlc.FMUser{}, errors.New("repository error"))
+			On("GetUserById", ctx, int64(1)).
+			Return(sqlc.GetUserByIdRow{}, errors.New("repository error"))
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
 
@@ -110,21 +110,14 @@ func TestGetUser(t *testing.T) {
 	})
 }
 
-func TestListUsers(t *testing.T) {
+func TestGetAllUsers(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
 		ctx := context.Background()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("ListUsers").
-			Return([]sqlc.FMUser{
-				{
-					ID:       1,
-					Username: "testuser",
-					Email:    "test@example.com",
-					Password: mock.Anything,
-				},
-			}, nil)
+			On("GetAllUsers", ctx).
+			Return([]int64{1}, nil)
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
 
@@ -138,8 +131,8 @@ func TestListUsers(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("ListUsers").
-			Return([]sqlc.FMUser{}, errors.New("repository error"))
+			On("GetAllUsers", ctx).
+			Return([]int64{}, errors.New("repository error"))
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
 
@@ -156,7 +149,7 @@ func TestUpdateUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("UpdateUser", int64(1), "testuser", "test@example.com", mock.Anything).
+			On("UpdateUser", ctx, int64(1), "testuser", "test@example.com", mock.Anything).
 			Return(nil)
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
@@ -171,7 +164,7 @@ func TestUpdateUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("UpdateUser", int64(1), "testuser", "test@example.com", mock.Anything).
+			On("UpdateUser", ctx, int64(1), "testuser", "test@example.com", mock.Anything).
 			Return(errors.New("repository error"))
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
@@ -189,7 +182,7 @@ func TestDeleteUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("DeleteUser", int64(1)).
+			On("DeleteUser", ctx, int64(1)).
 			Return(nil)
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
@@ -203,7 +196,7 @@ func TestDeleteUser(t *testing.T) {
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
-			On("DeleteUser", int64(1)).
+			On("DeleteUser", ctx, int64(1)).
 			Return(errors.New("repository error"))
 
 		service := NewUserService(mockRepo, &tls.Config{}, &kafka.Writer{}, &utils.JWTManager{}, &redis.Client{})
