@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"context"
 	"crypto/tls"
 	"errors"
 	"testing"
@@ -17,7 +16,7 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -39,7 +38,7 @@ func TestCreateUser(t *testing.T) {
 	})
 
 	t.Run("error case - email already exists", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -54,7 +53,7 @@ func TestCreateUser(t *testing.T) {
 	})
 
 	t.Run("error case - repository error", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -74,7 +73,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -94,7 +93,7 @@ func TestGetUser(t *testing.T) {
 	})
 
 	t.Run("error case - repository error", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -112,7 +111,7 @@ func TestGetUser(t *testing.T) {
 
 func TestGetAllUsers(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -127,7 +126,7 @@ func TestGetAllUsers(t *testing.T) {
 	})
 
 	t.Run("error case - repository error", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -145,7 +144,7 @@ func TestGetAllUsers(t *testing.T) {
 
 func TestUpdateUser(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -160,7 +159,7 @@ func TestUpdateUser(t *testing.T) {
 	})
 
 	t.Run("error case - repository error", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -178,7 +177,7 @@ func TestUpdateUser(t *testing.T) {
 
 func TestDeleteUser(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.
@@ -192,7 +191,7 @@ func TestDeleteUser(t *testing.T) {
 	})
 
 	t.Run("error case - repository error", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewUserRepository(t)
 
 		mockRepo.

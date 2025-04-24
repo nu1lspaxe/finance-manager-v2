@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"context"
 	"errors"
 	"records/pkg/mocks"
 	"records/postgres/sqlc"
@@ -14,7 +13,7 @@ import (
 
 func TestCreateRecord(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -36,7 +35,7 @@ func TestCreateRecord(t *testing.T) {
 	})
 
 	t.Run("error case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -53,7 +52,7 @@ func TestCreateRecord(t *testing.T) {
 
 func TestGetRecord(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -75,7 +74,7 @@ func TestGetRecord(t *testing.T) {
 	})
 
 	t.Run("error case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -92,7 +91,7 @@ func TestGetRecord(t *testing.T) {
 
 func TestGetUserRecordsWithFilters(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -116,7 +115,7 @@ func TestGetUserRecordsWithFilters(t *testing.T) {
 	})
 
 	t.Run("error case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -133,7 +132,7 @@ func TestGetUserRecordsWithFilters(t *testing.T) {
 
 func TestUpdateRecord(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -148,7 +147,7 @@ func TestUpdateRecord(t *testing.T) {
 	})
 
 	t.Run("error case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -165,7 +164,7 @@ func TestUpdateRecord(t *testing.T) {
 
 func TestDeleteRecord(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
@@ -180,7 +179,7 @@ func TestDeleteRecord(t *testing.T) {
 	})
 
 	t.Run("error case", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		mockRepo := mocks.NewRecordRepository(t)
 
 		mockRepo.
