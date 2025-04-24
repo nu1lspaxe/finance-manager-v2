@@ -58,7 +58,7 @@ func (j *JWTManager) Verify(tokenString string) (*FMJWTClaims, error) {
 		return nil, NewBankRecordError(ErrTokenInvalid)
 	}
 
-	if claims.ExpiresAt.Time.Unix() < time.Now().Unix() {
+	if claims.ExpiresAt.Unix() < time.Now().Unix() {
 		return nil, NewBankRecordError(ErrTokenInvalid)
 	}
 

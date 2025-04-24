@@ -81,5 +81,7 @@ func (s *Server) Start(port, certFile, keyFile string) error {
 
 func (s *Server) Stop() {
 	s.pool.Close()
-	s.cron.Stop()
+	if err := s.cron.Stop(); err != nil {
+		s.logger.Printf("Failed to stop cronjob: %v\n", err)
+	}
 }

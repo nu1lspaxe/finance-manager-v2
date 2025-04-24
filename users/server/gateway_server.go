@@ -20,7 +20,10 @@ type GatewayServer struct {
 
 func NewGatewayServer(tlsConfig *tls.Config, logger *zap.Logger) *GatewayServer {
 	mux := runtime.NewServeMux(runtime.WithMiddlewares())
-	mux.HandlePath("GET", "/openapiv2/*", openAPIServer("proto/openapiv2"))
+	err := mux.HandlePath("GET", "/openapiv2/*", openAPIServer("proto/openapiv2"))
+	if err != nil {
+		logger.Fatal("Failed to register OpenAPI handler", zap.Error(err))
+	}
 
 	return &GatewayServer{
 		server: &http.Server{

@@ -70,7 +70,7 @@ func (j *JWTManager) Verify(tokenString string) (*FMJWTClaims, error) {
 		return nil, NewUserError(ErrTokenInvalid)
 	}
 
-	if claims.ExpiresAt.Time.Unix() < time.Now().Unix() {
+	if claims.ExpiresAt.Unix() < time.Now().Unix() {
 		return nil, NewUserError(ErrTokenInvalid)
 	}
 

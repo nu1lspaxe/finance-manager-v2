@@ -3,6 +3,8 @@ package account
 import (
 	"bank_system/postgres/sqlc"
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -80,7 +82,11 @@ func (r *accountRepositoryImpl) WithdrawFromAccount(
 	if err != nil {
 		return 0, 0, err
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			fmt.Fprintf(os.Stderr, "Error rolling back transaction: %v\n", err)
+		}
+	}()
 
 	result, err := r.queries.WithTx(tx).WithdrawFromAccount(ctx, sqlc.WithdrawFromAccountParams{
 		AccountID: accountID,
@@ -113,7 +119,11 @@ func (r *accountRepositoryImpl) DepositToAccount(
 	if err != nil {
 		return 0, 0, err
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			fmt.Fprintf(os.Stderr, "Error rolling back transaction: %v\n", err)
+		}
+	}()
 
 	result, err := r.queries.WithTx(tx).DepositToAccount(ctx, sqlc.DepositToAccountParams{
 		AccountID: accountID,

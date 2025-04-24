@@ -49,7 +49,11 @@ func NewServer() (*Server, error) {
 }
 
 func (a *Server) Run() error {
-	defer a.Logger.Sync()
+	defer func() {
+		if err := a.Logger.Sync(); err != nil {
+			a.Logger.Error("Failed to sync logger", zap.Error(err))
+		}
+	}()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

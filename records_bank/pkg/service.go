@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"records_bank/postgres/sqlc"
 	"records_bank/utils"
 
@@ -88,7 +89,11 @@ func fetchBankAccountTxs(ctx context.Context, client *http.Client, idNumber stri
 	if err != nil {
 		return []TxResponse{}, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error closing response body: %v\n", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return []TxResponse{}, utils.NewBankRecordError(

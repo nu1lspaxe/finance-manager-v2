@@ -1,12 +1,6 @@
 package simulator
 
 import (
-	"bank_system/utils"
-	"bytes"
-	"encoding/json"
-	"io"
-	"net/http"
-
 	"github.com/spf13/viper"
 )
 
@@ -26,47 +20,47 @@ func NewLLModel(messages []Message) *LLModel {
 	}
 }
 
-func (l *LLModel) GenerateContent() (string, error) {
-	requestBody := RequestBody{
-		Model:    l.Model,
-		Messages: l.messages,
-	}
+// func (l *LLModel) GenerateContent() (string, error) {
+// 	requestBody := RequestBody{
+// 		Model:    l.Model,
+// 		Messages: l.messages,
+// 	}
 
-	jsonData, err := json.Marshal(requestBody)
-	if err != nil {
-		return "", utils.NewBankSystemError(utils.ErrRequest)
-	}
+// 	jsonData, err := json.Marshal(requestBody)
+// 	if err != nil {
+// 		return "", utils.NewBankSystemError(utils.ErrRequest)
+// 	}
 
-	req, err := http.NewRequest("POST", l.URL, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return "", utils.NewBankSystemError(utils.ErrRequest)
-	}
+// 	req, err := http.NewRequest("POST", l.URL, bytes.NewBuffer(jsonData))
+// 	if err != nil {
+// 		return "", utils.NewBankSystemError(utils.ErrRequest)
+// 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+l.APIKey)
+// 	req.Header.Set("Content-Type", "application/json")
+// 	req.Header.Set("Authorization", "Bearer "+l.APIKey)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", utils.NewBankSystemError(utils.ErrRequest)
-	}
-	defer resp.Body.Close()
+// 	client := &http.Client{}
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		return "", utils.NewBankSystemError(utils.ErrRequest)
+// 	}
+// 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", utils.NewBankSystemError(utils.ErrRequest)
-	}
+// 	body, err := io.ReadAll(resp.Body)
+// 	if err != nil {
+// 		return "", utils.NewBankSystemError(utils.ErrRequest)
+// 	}
 
-	var response ResponseBody
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return "", utils.NewBankSystemError(utils.ErrRequest)
-	}
+// 	var response ResponseBody
+// 	err = json.Unmarshal(body, &response)
+// 	if err != nil {
+// 		return "", utils.NewBankSystemError(utils.ErrRequest)
+// 	}
 
-	if len(response.Choices) > 0 {
-		content := response.Choices[0].Message.Content
-		return content, nil
-	} else {
-		return "", utils.NewBankSystemError(utils.ErrGenerateNoContent)
-	}
-}
+// 	if len(response.Choices) > 0 {
+// 		content := response.Choices[0].Message.Content
+// 		return content, nil
+// 	} else {
+// 		return "", utils.NewBankSystemError(utils.ErrGenerateNoContent)
+// 	}
+// }

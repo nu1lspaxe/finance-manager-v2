@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 	"users/postgres/sqlc"
 	"users/utils"
@@ -178,7 +179,11 @@ func getAccountBalance(ctx context.Context, client *http.Client, idNumber string
 	if err != nil {
 		return 0, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error closing response body: %v\n", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return 0, utils.NewUserError(utils.ErrStatusCode, fmt.Sprint(resp.StatusCode))

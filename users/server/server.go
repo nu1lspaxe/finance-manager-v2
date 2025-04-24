@@ -139,7 +139,12 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) Shutdown(ctx context.Context) {
-	defer s.logger.Sync()
+	defer func() {
+		if err := s.logger.Sync(); err != nil {
+			s.logger.Error("Failed to sync logger", zap.Error(err))
+		}
+	}()
+
 	if err := s.gateway.server.Shutdown(ctx); err != nil {
 		s.logger.Error("Failed to shutdown HTTP server:", zap.Error(err))
 	}

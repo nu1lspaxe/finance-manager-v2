@@ -15,7 +15,10 @@ func init() {
 	viper.AddConfigPath("./configs")
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
-	viper.ReadInConfig()
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
 
 	certFile = viper.GetString("certs.path.cert")
 	keyFile = viper.GetString("certs.path.key")

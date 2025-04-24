@@ -18,7 +18,9 @@ func (s *Server) StartCronJob(ctx context.Context) {
 			if err := s.service.KafkaWriter.Close(); err != nil {
 				s.logger.Error("Failed to close Kafka writer", zap.Error(err))
 			}
-			s.logger.Sync()
+			if err := s.logger.Sync(); err != nil {
+				s.logger.Error("Failed to sync logger", zap.Error(err))
+			}
 			return
 		case <-ticker.C:
 			err := s.service.UpdateAccountBalanceJob(ctx)

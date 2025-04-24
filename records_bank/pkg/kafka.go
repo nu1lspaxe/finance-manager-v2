@@ -2,11 +2,17 @@ package pkg
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"strconv"
 )
 
 func (s *BankRecordService) ConsumeUpdateAccountMessage(ctx context.Context) error {
-	defer s.kafkaReader.Close()
+	defer func() {
+		if err := s.kafkaReader.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error closing Kafka reader: %v\n", err)
+		}
+	}()
 
 	for {
 		select {
