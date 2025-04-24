@@ -15,7 +15,11 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: '1.24'
-      - name: download go mod dependencies
-        run: go mod download all 
+      - name: Download all module deps
+        run: |
+          for dir in $(find . -name go.mod -exec dirname {} \;); do
+            echo ">> tidy $dir"
+            (cd "$dir" && go mod tidy)
+          done
       - name: run tests
         run: find . -name 'go.mod' -exec dirname {} \; | xargs -I{} bash -c 'cd "{}" && go test ./...'
