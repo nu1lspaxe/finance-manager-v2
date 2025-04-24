@@ -21,6 +21,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+      - name: Generate go.work
+        run: |
+          go work init ./bank_system ./records ./records_bank ./users
       - id: set-modules
         run: |
           MODULES=$(go list -m -json | jq -s '.' | jq -c '[.[].Dir]')
