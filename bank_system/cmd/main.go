@@ -2,6 +2,7 @@ package main
 
 import (
 	"bank_system/server"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -9,6 +10,10 @@ import (
 var port, certFile, keyFile string
 
 func init() {
+	if os.Getenv("CI") == "true" {
+		return
+	}
+
 	viper.AddConfigPath("./configs")
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")

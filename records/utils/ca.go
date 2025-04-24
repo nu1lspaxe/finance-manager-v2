@@ -12,6 +12,10 @@ import (
 var certFile, keyFile, caFile string
 
 func init() {
+	if os.Getenv("CI") == "true" {
+		return
+	}
+
 	viper.AddConfigPath("./configs")
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")

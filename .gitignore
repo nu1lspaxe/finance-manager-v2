@@ -24,7 +24,7 @@ go.work.sum
 # env file
 .env
 */*.env
-*/configs/*
+*/configs/config.json
 
 # CA setup
 */certs/*
