@@ -16,4 +16,4 @@ jobs:
         with:
           go-version: '1.24'
       - name: run tests
-        run: go list -m -f '{{.Path}}/...' | xargs go test 
+        run: find . -name 'go.mod' -exec dirname {} \; | xargs -I{} bash -c 'cd "{}" && go test ./...'
