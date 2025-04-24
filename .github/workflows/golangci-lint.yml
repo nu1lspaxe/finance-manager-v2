@@ -24,12 +24,6 @@ jobs:
       - name: Generate go.work
         run: |
           go work init ./bank_system ./records ./records_bank ./users
-      - name: Download all module deps
-        run: |
-          for dir in $(find . -name go.mod -exec dirname {} \;); do
-            echo ">> tidy $dir"
-            (cd "$dir" && go mod tidy)
-          done
       - id: set-modules
         run: |
           MODULES=$(go list -m -json | jq -s '.' | jq -c '[.[].Dir]')
